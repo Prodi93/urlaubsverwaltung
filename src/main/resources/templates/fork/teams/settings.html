@@ -1,0 +1,61 @@
+<!doctype html>
+<html
+  lang="en"
+  th:lang="${language}"
+  th:class="|theme-${theme}|"
+  th:data-nav-collapsed="${navigationCollapsed ? 'true' : null}"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:asset="http://www.w3.org/1999/xhtml"
+>
+  <head th:replace="~{_layout::head(title=~{::title}, scriptsDefer=~{::scriptsDefer}, preload=~{::preload})}">
+    <title th:replace="~{fragments/page-title::page-title(#{fork.teams.settings.title})}"></title>
+    <th:block th:fragment="preload">
+      <link rel="preload" th:replace="~{fragments/asset-dependency-preload::links('fork_presence.js')}" />
+    </th:block>
+    <th:block th:fragment="scriptsDefer">
+      <script defer type="module" asset:src="fork_presence.js"></script>
+    </th:block>
+  </head>
+  <body th:replace="~{_layout::body(content=~{::main})}">
+    <main th:fragment="main" class="content-container content--max-w space-y-6" data-test-id="teams-settings">
+      <h1 class="text-2xl font-medium" th:text="#{fork.teams.settings.title}">Microsoft Teams</h1>
+      <p th:text="#{fork.teams.settings.description}"></p>
+
+      <div th:unless="${teamsEnabled}" class="alert alert-danger" data-test-id="teams-disabled">
+        <p th:text="#{fork.teams.settings.disabled}"></p>
+        <pre class="mt-2 text-sm">
+uv:
+  fork:
+    teams:
+      enabled: true</pre>
+      </div>
+
+      <section class="space-y-2">
+        <h2 class="text-lg font-medium" th:text="#{fork.teams.settings.steps}">Einrichtung</h2>
+        <ol class="list-decimal pl-5 space-y-2 text-sm">
+          <li th:text="#{fork.teams.settings.step1}"></li>
+          <li>
+            <span th:text="#{fork.teams.settings.step2}"></span>
+            <a
+              class="button-main-green ml-2 inline-flex items-center gap-2"
+              th:href="@{/web/settings/teams/app-package}"
+              data-test-id="teams-app-package"
+            >
+              <svg th:replace="~{icon/download::svg(className='w-4 h-4')}" />
+              <span th:text="#{fork.teams.settings.download}">App-Paket herunterladen</span>
+            </a>
+          </li>
+          <li th:text="#{fork.teams.settings.step3}"></li>
+          <li th:text="#{fork.teams.settings.step4}"></li>
+          <li th:text="#{fork.teams.settings.step5}"></li>
+        </ol>
+      </section>
+
+      <section class="text-sm text-black/75 dark:text-zinc-300 space-y-1">
+        <p th:text="|#{fork.teams.settings.url}: ${applicationUrl}|"></p>
+        <p th:text="|#{fork.teams.settings.appId}: ${appId}|"></p>
+        <p th:text="#{fork.teams.settings.update}"></p>
+      </section>
+    </main>
+  </body>
+</html>

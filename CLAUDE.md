@@ -60,9 +60,9 @@ npx vitest run src/main/javascript/js/fork && npx eslint src/main/javascript && 
 
 ## Konventionen für Fork-Code
 
-- Java: `org.synyx.urlaubsverwaltung.fork.<feature>` (publicholiday, mail.oauth2, pwa, parttime, presence, csv, application).
+- Java: `org.synyx.urlaubsverwaltung.fork.<feature>` (publicholiday, mail.oauth2, pwa, parttime, presence, csv, application, teams).
   Ausnahme: `application/application/ForkApplicationForLeaveCreator` (braucht package-private Upstream-Klassen).
-- Templates `templates/fork/**`, JS `src/main/javascript/js/fork/**` (Tests in `__tests__`), Bundle `bundles/fork-presence.js`.
+- Templates `templates/fork/**`, JS `src/main/javascript/js/fork/**` (Tests in `__tests__`), Bundles `bundles/fork-presence.js` und `bundles/fork-teams.js`.
 - Texte in `messages-fork{,_en,_el}.properties` (Basename in `application.yaml` **und** `src/test/resources/application.yaml`).
 - Liquibase in `dbchangelogs/fork/` (`fork-000N-….xml`, Autor `prodi`), Tabellen mit Präfix `fork_`. Entities erben von
   `AbstractTenantAwareEntity`, Sequenz-`incrementBy` = `allocationSize` (10).
@@ -87,6 +87,8 @@ npx vitest run src/main/javascript/js/fork && npx eslint src/main/javascript && 
   `PresenceSlots` (in der DB `OFFICE|HOME_OFFICE`). Monatsplanung `/web/presence/persons/{id}` beantragt Abwesenheiten über
   `ForkApplicationForLeaveCreator`. Box „Diese Woche“ und Menü im Kalender der Übersichtsseite (`js/fork/presence-calendar.js`).
   Farben: Büro blau (sky), Homeoffice grün (emerald), Mobil lila (violet).
+- **Microsoft Teams**: `uv.fork.teams.enabled`. `TeamsEmbeddingFilter` erlaubt die Einbettung und leitet Logins im Frame auf
+  `/fork/teams/tab` um, das per TeamsJS-Popup anmeldet (`js/fork/teams.js`). App-Paket: Einstellungen → Microsoft Teams.
 - **CSV**: `/web/import-export`. Export je nach Rolle, Import nur Office (Vorschau, alles oder nichts).
 - **Antragsformular**: zeigt den verbleibenden Erholungsurlaub und die Teilzeit-Freitage.
 

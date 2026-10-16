@@ -884,7 +884,8 @@ class FrameDataProviderTest {
             new NavigationItemDto("settings-holiday-account-link", "/web/settings/account", "nav.settings.account", "user-cog", false, "settings-holiday-account-link"),
             new NavigationItemDto("settings-avatar-link", "/web/settings/avatar", "nav.settings.avatar", "user-cog", false, "settings-avatar-link"),
             new NavigationItemDto("settings-calendar-link", "/web/settings/calendar", "nav.settings.calendar", "calendar-cog", false, "settings-calendar-link"),
-            new NavigationItemDto("settings-calendar-sync-link", "/web/settings/calendar-sync", "nav.settings.calendarSync", "calendar-cog", false, "settings-calendar-sync-link")
+            new NavigationItemDto("settings-calendar-sync-link", "/web/settings/calendar-sync", "nav.settings.calendarSync", "calendar-cog", false, "settings-calendar-sync-link"),
+            new NavigationItemDto("settings-teams-link", "/web/settings/teams", "nav.settings.teams", "share-2", false, "settings-teams-link")
         );
     }
 

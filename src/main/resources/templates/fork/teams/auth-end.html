@@ -1,0 +1,13 @@
+<!doctype html>
+<html th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <th:block th:replace="~{fork/teams/_page::head(title=${applicationName})}"></th:block>
+  </head>
+  <body
+    data-teams-page="auth-end"
+    th:data-fallback="|${contextPath}/web/overview|"
+    class="min-h-screen flex items-center justify-center p-6"
+  >
+    <p th:text="#{fork.teams.authEnd.text}">Angemeldet, das Fenster schließt sich gleich.</p>
+  </body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <th:block th:replace="~{fork/teams/_page::head(title=${applicationName})}"></th:block>
+  </head>
+  <body
+    data-teams-page="tab"
+    th:data-target="${target}"
+    th:data-auth-end="|${contextPath}/fork/teams/auth-end|"
+    class="min-h-screen flex items-center justify-center p-6"
+  >
+    <main class="max-w-md text-center space-y-4">
+      <p data-teams-loading th:text="#{fork.teams.tab.loading}">Wird geladen …</p>
+      <div data-teams-login hidden class="space-y-4">
+        <h1 class="text-xl font-medium" th:text="${applicationName}">Urlaubsverwaltung</h1>
+        <p th:text="#{fork.teams.tab.login.text}">Bitte melde dich einmal mit deinem Microsoft-Konto an.</p>
+        <button
+          type="button"
+          class="button-main-green"
+          data-teams-login-button
+          th:text="#{fork.teams.tab.login.button}"
+        >
+          Anmelden
+        </button>
+        <p
+          data-teams-error
+          hidden
+          class="text-sm text-red-700 dark:text-red-400"
+          th:text="#{fork.teams.tab.login.error}"
+        >
+          Die Anmeldung hat nicht geklappt.
+        </p>
+      </div>
+    </main>
+  </body>
+</html>

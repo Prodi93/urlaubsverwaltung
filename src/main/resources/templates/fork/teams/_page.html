@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title></title>
+  </head>
+  <body>
+    <!-- head of the standalone Teams pages (no layout of the application, see TeamsController) -->
+    <th:block th:fragment="head(title)">
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title th:text="${title}">Urlaubsverwaltung</title>
+      <link rel="stylesheet" type="text/css" th:href="${commonCss}" />
+      <style>
+        body {
+          font-family:
+            system-ui,
+            -apple-system,
+            "Segoe UI",
+            Roboto,
+            sans-serif;
+        }
+        @media (prefers-color-scheme: dark) {
+          body {
+            background: #18181b;
+            color: #e4e4e7;
+          }
+        }
+      </style>
+      <script defer type="module" th:src="${teamsScript}"></script>
+    </th:block>
+  </body>
+</html>

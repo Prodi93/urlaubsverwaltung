@@ -1,0 +1,26 @@
+<!doctype html>
+<html th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <th:block th:replace="~{fork/teams/_page::head(title=${applicationName})}"></th:block>
+  </head>
+  <body data-teams-page="config" th:data-context-path="${contextPath}" class="p-6">
+    <main class="max-w-lg space-y-4">
+      <h1 class="text-xl font-medium" th:text="#{fork.teams.config.title(${applicationName})}">
+        Urlaubsverwaltung als Tab
+      </h1>
+      <p th:text="#{fork.teams.config.text}">Welche Seite soll der Tab zeigen?</p>
+      <fieldset class="space-y-2">
+        <label th:each="target, stat : ${targets}" class="flex items-center gap-2">
+          <input
+            type="radio"
+            name="target"
+            th:value="${target}"
+            th:checked="${stat.first}"
+            th:data-label="#{${'fork.teams.target.' + stat.index}}"
+          />
+          <span th:text="#{${'fork.teams.target.' + stat.index}}">Teamkalender</span>
+        </label>
+      </fieldset>
+    </main>
+  </body>
+</html>

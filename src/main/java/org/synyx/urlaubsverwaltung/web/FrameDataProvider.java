@@ -253,6 +253,8 @@ public class FrameDataProvider implements DataProviderInterface {
             elements.add(new NavigationItemDto("settings-avatar-link", avatar, "nav.settings.avatar", "user-cog", url.equals(avatar), "settings-avatar-link"));
             elements.add(new NavigationItemDto("settings-calendar-link", calendar, "nav.settings.calendar", "calendar-cog", url.equals(calendar), "settings-calendar-link"));
             elements.add(new NavigationItemDto("settings-calendar-sync-link", calendarSync, "nav.settings.calendarSync", "calendar-cog", url.equals(calendarSync), "settings-calendar-sync-link"));
+            // LI fork: microsoft teams app
+            elements.add(new NavigationItemDto("settings-teams-link", "/web/settings/teams", "nav.settings.teams", "share-2", url.equals("/web/settings/teams"), "settings-teams-link"));
         }
 
         return elements;
