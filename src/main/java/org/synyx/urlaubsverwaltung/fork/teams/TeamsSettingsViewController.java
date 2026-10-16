@@ -28,12 +28,14 @@ class TeamsSettingsViewController implements HasLaunchpad, HasPersonSearch {
 
     private final TeamsAppManifestService manifestService;
     private final TeamsProperties teamsProperties;
+    private final TeamsSsoSettings ssoSettings;
     private final PersonSearchUiFragmentSupplier personSearchUiFragmentSupplier;
 
-    TeamsSettingsViewController(TeamsAppManifestService manifestService, TeamsProperties teamsProperties,
+    TeamsSettingsViewController(TeamsAppManifestService manifestService, TeamsProperties teamsProperties, TeamsSsoSettings ssoSettings,
                                 PersonSearchUiFragmentSupplier personSearchUiFragmentSupplier) {
         this.manifestService = manifestService;
         this.teamsProperties = teamsProperties;
+        this.ssoSettings = ssoSettings;
         this.personSearchUiFragmentSupplier = personSearchUiFragmentSupplier;
     }
 
@@ -52,6 +54,9 @@ class TeamsSettingsViewController implements HasLaunchpad, HasPersonSearch {
         model.addAttribute("teamsEnabled", teamsProperties.enabled());
         model.addAttribute("applicationUrl", manifestService.applicationUrl());
         model.addAttribute("appId", manifestService.appId());
+        model.addAttribute("ssoAvailable", ssoSettings.isAvailable());
+        model.addAttribute("ssoClientId", ssoSettings.clientId().orElse(null));
+        model.addAttribute("ssoApplicationIdUri", ssoSettings.applicationIdUri().orElse(null));
         return "fork/teams/settings";
     }
 
@@ -60,6 +65,6 @@ class TeamsSettingsViewController implements HasLaunchpad, HasPersonSearch {
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("application/zip"));
         headers.setContentDisposition(ContentDisposition.attachment().filename("urlaubsverwaltung-teams.zip").build());
-        return ResponseEntity.ok().headers(headers).body(manifestService.appPackage(locale));
+        return ResponseEntity.ok().headers(headers).body(manifestService.appPackage(locale, ssoSettings.clientId(), ssoSettings.applicationIdUri()));
     }
 }

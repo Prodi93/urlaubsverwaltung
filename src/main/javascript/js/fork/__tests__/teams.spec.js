@@ -1,4 +1,4 @@
-import { initAuthEnd, initConfig, initTab, initializeTeams, isSignedIn } from "../teams";
+import { initAuthEnd, initConfig, initTab, initializeTeams, isSignedIn, signInWithTeamsSso } from "../teams";
 
 describe("teams", function () {
   afterEach(function () {
@@ -15,7 +15,7 @@ describe("teams", function () {
     document.body.dataset.authEnd = "/fork/teams/auth-end";
     document.body.innerHTML = `
       <p data-teams-loading></p>
-      <div data-teams-login hidden><button data-teams-login-button></button><p data-teams-error hidden></p></div>`;
+      <div data-teams-login hidden><p data-teams-unknown-person hidden></p><button data-teams-login-button></button><p data-teams-error hidden></p></div>`;
     return document.body;
   }
 
@@ -58,6 +58,50 @@ describe("teams", function () {
     body.querySelector("[data-teams-login-button]").click();
     await vi.waitFor(() => expect(navigate).toHaveBeenCalledWith("/web/presence"));
     expect(teamsAuthentication.authenticate.mock.calls[0][0].url).toContain("/fork/teams/auth-end");
+  });
+
+  it("signs in silently with teams sso", async function () {
+    const navigate = vi.fn();
+    const body = renderTab();
+    body.dataset.ssoUrl = "/fork/teams/sso";
+    const fetchFunction = vi.fn((url) =>
+      Promise.resolve(url === "/fork/teams/sso" ? { ok: true } : { type: "opaqueredirect", ok: false }),
+    );
+    const teamsAuthentication = { getAuthToken: vi.fn(() => Promise.resolve("token")) };
+
+    await initTab(body, { teamsApp: inTeams(), teamsAuthentication, fetchFunction, navigate });
+
+    expect(navigate).toHaveBeenCalledWith("/web/presence");
+    expect(fetchFunction).toHaveBeenCalledWith(
+      "/fork/teams/sso",
+      expect.objectContaining({ method: "POST", headers: { Authorization: "Bearer token" } }),
+    );
+    delete body.dataset.ssoUrl;
+  });
+
+  it("shows the sign in with a hint if the person is unknown", async function () {
+    const navigate = vi.fn();
+    const body = renderTab();
+    body.dataset.ssoUrl = "/fork/teams/sso";
+    const fetchFunction = (url) =>
+      Promise.resolve(
+        url === "/fork/teams/sso"
+          ? { ok: false, json: () => Promise.resolve({ error: "unknown_person" }) }
+          : { type: "opaqueredirect", ok: false },
+      );
+    const teamsAuthentication = { getAuthToken: () => Promise.resolve("token") };
+
+    await initTab(body, { teamsApp: inTeams(), teamsAuthentication, fetchFunction, navigate });
+
+    expect(navigate).not.toHaveBeenCalled();
+    expect(body.querySelector("[data-teams-login]").hidden).toBe(false);
+    expect(body.querySelector("[data-teams-unknown-person]").hidden).toBe(false);
+    delete body.dataset.ssoUrl;
+  });
+
+  it("falls back to the popup if teams sso fails", async function () {
+    const teamsAuthentication = { getAuthToken: () => Promise.reject(new Error("consent required")) };
+    expect(await signInWithTeamsSso("/sso", teamsAuthentication)).toBe("failed");
   });
 
   it("notifies teams at the end of the sign in", async function () {

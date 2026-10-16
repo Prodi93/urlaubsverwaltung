@@ -39,4 +39,24 @@ class TeamsAppManifestServiceTest {
         assertThat(image.getColorModel().hasAlpha()).isTrue();
         assertThat(image.getRGB(0, 0) >>> 24).isZero();
     }
+
+    @Test
+    void ensureManifestContainsSingleSignOnOnlyWithEntraApp() {
+        final org.synyx.urlaubsverwaltung.mail.MailProperties mailProperties = org.mockito.Mockito.mock(org.synyx.urlaubsverwaltung.mail.MailProperties.class);
+        org.mockito.Mockito.when(mailProperties.getApplicationUrl()).thenReturn("https://urlaub.example.org/");
+        final org.springframework.context.support.StaticMessageSource messageSource = new org.springframework.context.support.StaticMessageSource();
+        messageSource.setUseCodeAsDefaultMessage(true);
+        final TeamsAppManifestService sut = new TeamsAppManifestService(mailProperties,
+            new org.synyx.urlaubsverwaltung.branding.BrandingProperties("Urlaubsverwaltung"), messageSource,
+            new org.springframework.core.io.DefaultResourceLoader(), "6.17.0-li.5");
+
+        final java.util.Map<String, Object> withSso = sut.manifest(java.util.Locale.GERMAN,
+            java.util.Optional.of("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"), java.util.Optional.of("api://urlaub.example.org/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"));
+        final java.util.Map<String, Object> withoutSso = sut.manifest(java.util.Locale.GERMAN, java.util.Optional.empty(), java.util.Optional.empty());
+
+        assertThat(withSso).containsEntry("webApplicationInfo", java.util.Map.of(
+            "id", "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", "resource", "api://urlaub.example.org/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"));
+        assertThat(withSso).containsEntry("version", "6.17.5").containsEntry("validDomains", java.util.List.of("urlaub.example.org"));
+        assertThat(withoutSso).doesNotContainKey("webApplicationInfo");
+    }
 }

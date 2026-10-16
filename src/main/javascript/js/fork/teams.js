@@ -29,11 +29,39 @@ export async function isSignedIn(target, fetchFunction = globalThis.fetch) {
   }
 }
 
+/**
+ * Teams single sign on: Teams issues a token of Entra ID for this application without any popup, the server signs in
+ * with it. Needs "Expose an API" in the app registration and webApplicationInfo in the app manifest.
+ *
+ * @return {Promise<"ok"|"unknown_person"|"failed">}
+ */
+export async function signInWithTeamsSso(
+  ssoUrl,
+  teamsAuthentication = authentication,
+  fetchFunction = globalThis.fetch,
+) {
+  try {
+    const token = await teamsAuthentication.getAuthToken();
+    const response = await fetchFunction(ssoUrl, {
+      method: "POST",
+      credentials: "include",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (response.ok) {
+      return "ok";
+    }
+    const body = await response.json().catch(() => ({}));
+    return body.error === "unknown_person" ? "unknown_person" : "failed";
+  } catch {
+    return "failed";
+  }
+}
+
 export async function initTab(
   body,
   { teamsApp = app, teamsAuthentication = authentication, fetchFunction, navigate } = {},
 ) {
-  const { target, authEnd } = body.dataset;
+  const { target, authEnd, ssoUrl } = body.dataset;
   const goToTarget = navigate ?? ((url) => globalThis.location.replace(url));
 
   const inTeams = await initializeTeams(teamsApp);
@@ -43,8 +71,15 @@ export async function initTab(
     return;
   }
 
+  const sso = ssoUrl ? await signInWithTeamsSso(ssoUrl, teamsAuthentication, fetchFunction) : "failed";
+  if (sso === "ok") {
+    goToTarget(target);
+    return;
+  }
+
   body.querySelector("[data-teams-loading]").hidden = true;
   body.querySelector("[data-teams-login]").hidden = false;
+  body.querySelector("[data-teams-unknown-person]").hidden = sso !== "unknown_person";
   body.querySelector("[data-teams-login-button]").addEventListener("click", async () => {
     body.querySelector("[data-teams-error]").hidden = true;
     try {

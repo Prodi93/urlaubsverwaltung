@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -81,7 +82,11 @@ class TeamsAppManifestService {
         return matcher.group(1) + "." + matcher.group(2) + "." + (patch * 100 + fork);
     }
 
-    Map<String, Object> manifest(Locale locale) {
+    /**
+     * @param clientId         client id of the Entra app registration, enables the Teams single sign on
+     * @param applicationIdUri application id uri of the app registration ("Expose an API")
+     */
+    Map<String, Object> manifest(Locale locale, Optional<String> clientId, Optional<String> applicationIdUri) {
         final String url = applicationUrl();
         final String name = brandingProperties.name();
 
@@ -110,14 +115,17 @@ class TeamsAppManifestService {
         )));
         manifest.put("permissions", List.of("identity"));
         manifest.put("validDomains", List.of(URI.create(url).getAuthority()));
+        if (clientId.isPresent() && applicationIdUri.isPresent()) {
+            manifest.put("webApplicationInfo", Map.of("id", clientId.get(), "resource", applicationIdUri.get()));
+        }
         return manifest;
     }
 
-    byte[] appPackage(Locale locale) {
+    byte[] appPackage(Locale locale, Optional<String> clientId, Optional<String> applicationIdUri) {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try (ZipOutputStream zip = new ZipOutputStream(outputStream)) {
             zip.putNextEntry(new ZipEntry("manifest.json"));
-            zip.write(JsonMapper.builder().build().writerWithDefaultPrettyPrinter().writeValueAsBytes(manifest(locale)));
+            zip.write(JsonMapper.builder().build().writerWithDefaultPrettyPrinter().writeValueAsBytes(manifest(locale, clientId, applicationIdUri)));
             zip.closeEntry();
             zip.putNextEntry(new ZipEntry("color.png"));
             zip.write(colorIcon());

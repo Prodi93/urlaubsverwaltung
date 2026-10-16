@@ -51,6 +51,38 @@ uv:
         </ol>
       </section>
 
+      <section class="space-y-2" data-test-id="teams-sso">
+        <h2 class="text-lg font-medium" th:text="#{fork.teams.settings.sso.title}">Einmal-Anmeldung (Teams SSO)</h2>
+        <p class="text-sm" th:text="#{fork.teams.settings.sso.description}"></p>
+        <p
+          th:unless="${ssoAvailable}"
+          class="alert alert-danger text-sm"
+          th:text="#{fork.teams.settings.sso.unavailable}"
+        ></p>
+        <ol th:if="${ssoAvailable}" class="list-decimal pl-5 space-y-2 text-sm">
+          <li>
+            <span th:text="#{fork.teams.settings.sso.step1}"></span>
+            <code class="block mt-1 select-all" th:text="${ssoApplicationIdUri}">api://urlaub.example.org/...</code>
+          </li>
+          <li>
+            <span th:text="#{fork.teams.settings.sso.step2}"></span>
+            <code class="block mt-1 select-all">access_as_user</code>
+          </li>
+          <li>
+            <span th:text="#{fork.teams.settings.sso.step3}"></span>
+            <code class="block mt-1 select-all">1fec8e78-bce4-4aaf-ab1b-5451cc387264</code>
+            <code class="block select-all">5e3ce6c0-2b1f-4285-8d4b-75ee78787346</code>
+          </li>
+          <li th:text="#{fork.teams.settings.sso.step4}"></li>
+          <li th:text="#{fork.teams.settings.sso.step5}"></li>
+        </ol>
+        <p
+          th:if="${ssoAvailable}"
+          class="text-sm text-black/75 dark:text-zinc-300"
+          th:text="|#{fork.teams.settings.sso.clientId}: ${ssoClientId}|"
+        ></p>
+      </section>
+
       <section class="text-sm text-black/75 dark:text-zinc-300 space-y-1">
         <p th:text="|#{fork.teams.settings.url}: ${applicationUrl}|"></p>
         <p th:text="|#{fork.teams.settings.appId}: ${appId}|"></p>

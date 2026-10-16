@@ -88,7 +88,8 @@ npx vitest run src/main/javascript/js/fork && npx eslint src/main/javascript && 
   `ForkApplicationForLeaveCreator`. Box „Diese Woche“ und Menü im Kalender der Übersichtsseite (`js/fork/presence-calendar.js`).
   Farben: Büro blau (sky), Homeoffice grün (emerald), Mobil lila (violet).
 - **Microsoft Teams**: `uv.fork.teams.enabled`. `TeamsEmbeddingFilter` erlaubt die Einbettung und leitet Logins im Frame auf
-  `/fork/teams/tab` um, das per TeamsJS-Popup anmeldet (`js/fork/teams.js`). App-Paket: Einstellungen → Microsoft Teams.
+  `/fork/teams/tab` um. Der Tab meldet per Teams SSO an (`getAuthToken` → `POST /fork/teams/sso`, `TeamsTokenValidator`),
+  sonst per TeamsJS-Popup (`js/fork/teams.js`). App-Paket und Anleitung: Einstellungen → Microsoft Teams.
 - **CSV**: `/web/import-export`. Export je nach Rolle, Import nur Office (Vorschau, alles oder nichts).
 - **Antragsformular**: zeigt den verbleibenden Erholungsurlaub und die Teilzeit-Freitage.
 

@@ -7,6 +7,7 @@
     data-teams-page="tab"
     th:data-target="${target}"
     th:data-auth-end="|${contextPath}/fork/teams/auth-end|"
+    th:data-sso-url="|${contextPath}/fork/teams/sso|"
     class="min-h-screen flex items-center justify-center p-6"
   >
     <main class="max-w-md text-center space-y-4">
@@ -14,6 +15,9 @@
       <div data-teams-login hidden class="space-y-4">
         <h1 class="text-xl font-medium" th:text="${applicationName}">Urlaubsverwaltung</h1>
         <p th:text="#{fork.teams.tab.login.text}">Bitte melde dich einmal mit deinem Microsoft-Konto an.</p>
+        <p data-teams-unknown-person hidden class="text-sm" th:text="#{fork.teams.tab.unknownPerson}">
+          Du bist der Urlaubsverwaltung noch nicht bekannt.
+        </p>
         <button
           type="button"
           class="button-main-green"

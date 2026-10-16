@@ -32,9 +32,28 @@ In Entra ID ist nichts einzurichten. Die Anmeldung läuft über die bestehende O
 
 ## Anmeldung
 
-Microsoft lässt seine Anmeldeseite nicht in einem eingebetteten Frame anzeigen. Ist man in Teams noch nicht angemeldet,
-zeigt der Tab deshalb einen Button **Anmelden**. Er öffnet die normale Anmeldung in einem Teams-Popup, danach lädt der Tab
-die Seite. Läuft die Sitzung in Teams ab, landet man automatisch wieder auf diesem Button.
+1. **Teams SSO (empfohlen, auf BYOD-Geräten nötig):** Teams stellt dem Tab ein Entra-Token für die Urlaubsverwaltung aus,
+   ohne Fenster und ohne App-Wechsel. Der Server prüft das Token (Signatur, Tenant, Zielgruppe) und meldet die Person an,
+   die auch beim normalen Login erkannt würde: über das Subject, sonst über die E-Mail-Adresse. Personen, die die
+   Urlaubsverwaltung noch nicht kennt, müssen sich einmal im Browser anmelden.
+2. **Rückfall:** Ohne SSO-Einrichtung zeigt der Tab einen Button **Anmelden**, der die normale Anmeldung in einem
+   Teams-Popup öffnet. Auf Geräten mit Intune-App-Schutzrichtlinien (BYOD) ist dieses Popup gesperrt („Der Wechsel von hier
+   nach dort ist nicht möglich“). Dort hilft nur SSO.
+
+### Teams SSO einrichten (einmalig)
+
+In Entra ID → *App-Registrierungen* → die App-Registrierung der Urlaubsverwaltung (die mit der Client-ID aus
+`spring.security.oauth2.client.registration.default.client-id`). Die genauen Werte zeigt *Einstellungen → Microsoft Teams*.
+
+1. *Eine API verfügbar machen* → *URI der Anwendungs-ID*: `api://<host>/<client-id>`, z. B. `api://urlaub.firma.li/aaaa…`.
+2. *Bereich hinzufügen*: `access_as_user`, zustimmen dürfen *Administratoren und Benutzer*, Status *aktiviert*.
+3. *Clientanwendung hinzufügen* mit dem Bereich `access_as_user`:
+   - `1fec8e78-bce4-4aaf-ab1b-5451cc387264` (Teams Desktop und Mobile)
+   - `5e3ce6c0-2b1f-4285-8d4b-75ee78787346` (Teams Web)
+4. *API-Berechtigungen* → *Berechtigung hinzufügen* → *Meine APIs* → die Urlaubsverwaltung → `access_as_user` →
+   *Administratorzustimmung erteilen*.
+5. Das App-Paket neu herunterladen (es enthält jetzt `webApplicationInfo`) und im Teams Admin Center bei der bestehenden
+   App per *Datei hochladen* aktualisieren. Teams übernimmt die neue App-Version nach einigen Minuten, ggf. Teams neu starten.
 
 ## Update
 
@@ -45,4 +64,3 @@ nur, wenn sich Tabs oder Texte der App ändern sollen: im Teams Admin Center die
 
 - Teams im **Browser mit Safari** blockiert Cookies in eingebetteten Seiten. Dort funktioniert der Tab nicht, die Teams
   Desktop- und Mobile-App sind nicht betroffen.
-- Einmal-Anmeldung ohne Klick (Teams SSO) ist nicht umgesetzt.

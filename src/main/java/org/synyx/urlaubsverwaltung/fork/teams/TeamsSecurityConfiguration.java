@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.http.SessionCreationPolicy.NEVER;
 
 /**
@@ -26,6 +27,21 @@ class TeamsSecurityConfiguration {
             .csrf(AbstractHttpConfigurer::disable)
             .requestCache(AbstractHttpConfigurer::disable)
             .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(NEVER))
+            .build();
+    }
+
+    /**
+     * Teams single sign on: authenticated by the Entra token in the request, which creates the session.
+     * No csrf token, the request needs a valid bearer token.
+     */
+    @Bean
+    @Order(1)
+    SecurityFilterChain teamsSsoSecurityFilterChain(final HttpSecurity http) {
+        return http
+            .securityMatchers(configurer -> configurer.requestMatchers(POST, "/fork/teams/sso"))
+            .authorizeHttpRequests(requests -> requests.anyRequest().permitAll())
+            .csrf(AbstractHttpConfigurer::disable)
+            .requestCache(AbstractHttpConfigurer::disable)
             .build();
     }
 }
