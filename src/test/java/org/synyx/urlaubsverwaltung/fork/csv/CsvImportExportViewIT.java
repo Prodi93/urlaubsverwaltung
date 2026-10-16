@@ -29,6 +29,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -95,6 +96,19 @@ class CsvImportExportViewIT extends SingleTenantTestContainersBase {
             .andExpect(content().string(containsString("data-test-id=\"csv-import-result\"")))
             .andExpect(content().string(containsString("data-test-id=\"csv-import-execute\"")))
             .andExpect(content().string(containsString("Ungültiges Datum")));
+    }
+
+    @Test
+    void ensureOfficeSeesResultOfExecutedImport() throws Exception {
+        person.setPermissions(List.of(USER, OFFICE));
+        when(personService.getPersonByUsername("muster")).thenReturn(Optional.of(person));
+
+        // removing a presence that does not exist changes nothing
+        perform(post("/web/import-export/import/execute").param("dataset", "PRESENCES")
+            .param("content", "username;date;type\nmuster;2026-10-12;\n").with(csrf()))
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString("data-test-id=\"feedback-box\"")))
+            .andExpect(content().string(containsString("Import abgeschlossen")));
     }
 
     private ResultActions perform(AbstractMockHttpServletRequestBuilder<?> builder) throws Exception {

@@ -120,7 +120,7 @@
         <div th:if="${importResult != null}" data-test-id="csv-import-result">
           <div th:if="${importResult.executed}" class="mb-4">
             <div
-              th:replace="~{fragments/feedback-box::feedback-box-success(body=#{fork.csv.import.executed(${importResult.created}, ${importResult.updated}, ${importResult.deleted}, ${importResult.unchanged}, ${importResult.errors})})}"
+              th:replace="~{fork/feedback::success(text=#{fork.csv.import.executed(${importResult.created}, ${importResult.updated}, ${importResult.deleted}, ${importResult.unchanged}, ${importResult.errors})})}"
             ></div>
           </div>
           <div th:if="${importAborted}" class="alert alert-danger mb-4" th:text="#{fork.csv.import.aborted}"></div>

@@ -19,7 +19,7 @@
   <body th:replace="~{_layout::body(content=~{::main})}">
     <main th:fragment="main" class="content-container content--max-w">
       <div th:if="${presenceSaved}" class="mb-4">
-        <div th:replace="~{fragments/feedback-box::feedback-box-success(body=#{fork.presence.saved})}"></div>
+        <div th:replace="~{fork/feedback::success(text=#{fork.presence.saved})}"></div>
       </div>
 
       <div

@@ -53,7 +53,8 @@ class PartTimeViewIT extends SingleTenantTestContainersBase {
 
     @Test
     void ensurePartTimePageIsRendered() throws Exception {
-        perform(get("/web/person/1/parttime").param("year", "2026"))
+        perform(get("/web/person/1/parttime").param("year", "2026")
+            .flashAttr("partTimeSaved", true).flashAttr("partTimeDeleted", true).flashAttr("quotaSaved", true))
             .andExpect(status().isOk())
             .andExpect(content().string(containsString("data-test-id=\"parttime-summary\"")))
             .andExpect(content().string(containsString("data-test-id=\"parttime-form\"")))

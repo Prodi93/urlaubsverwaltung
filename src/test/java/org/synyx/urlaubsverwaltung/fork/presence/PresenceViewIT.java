@@ -61,14 +61,17 @@ class PresenceViewIT extends SingleTenantTestContainersBase {
 
     @Test
     void ensureTodayIsRendered() throws Exception {
-        perform(get("/web/presence/today"))
+        perform(get("/web/presence/today").flashAttr("presenceSaved", true))
             .andExpect(status().isOk())
-            .andExpect(content().string(containsString("data-test-id=\"presence-today\"")));
+            .andExpect(content().string(containsString("data-test-id=\"presence-today\"")))
+            .andExpect(content().string(containsString("data-test-id=\"feedback-box\"")));
     }
 
     @Test
     void ensurePlanningIsRendered() throws Exception {
-        perform(get("/web/presence/persons/1").param("year", "2026").param("month", "10"))
+        perform(get("/web/presence/persons/1").param("year", "2026").param("month", "10")
+            .flashAttr("presenceSaved", true).flashAttr("patternSaved", true)
+            .flashAttr("applicationsCreated", 2).flashAttr("applicationErrors", List.of("01.10.: Fehler")))
             .andExpect(status().isOk())
             .andExpect(content().string(containsString("data-test-id=\"presence-planning-form\"")))
             .andExpect(content().string(containsString("data-test-id=\"presence-pattern-form\"")));

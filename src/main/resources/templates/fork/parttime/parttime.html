@@ -19,13 +19,13 @@
   <body th:replace="~{_layout::body(content=~{::main})}">
     <main th:fragment="main" class="content-container content--max-w">
       <div th:if="${partTimeSaved}" class="mb-4">
-        <div th:replace="~{fragments/feedback-box::feedback-box-success(body=#{fork.parttime.saved})}"></div>
+        <div th:replace="~{fork/feedback::success(text=#{fork.parttime.saved})}"></div>
       </div>
       <div th:if="${partTimeDeleted}" class="mb-4">
-        <div th:replace="~{fragments/feedback-box::feedback-box-success(body=#{fork.parttime.deleted})}"></div>
+        <div th:replace="~{fork/feedback::success(text=#{fork.parttime.deleted})}"></div>
       </div>
       <div th:if="${quotaSaved}" class="mb-4">
-        <div th:replace="~{fragments/feedback-box::feedback-box-success(body=#{fork.parttime.quota.saved})}"></div>
+        <div th:replace="~{fork/feedback::success(text=#{fork.parttime.quota.saved})}"></div>
       </div>
 
       <div

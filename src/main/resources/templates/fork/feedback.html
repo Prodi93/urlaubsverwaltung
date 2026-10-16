@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title></title>
+  </head>
+  <body>
+    <!-- success message with a text, looks like fragments/feedback-box::feedback-box-success (which expects a fragment) -->
+    <div
+      th:fragment="success(text)"
+      th:with="id=${'feedback-' + #strings.randomAlphanumeric(8)}"
+      th:id="${id}"
+      class="uv-feedback-box alert alert-success flex flex-row justify-between gap-4 items-baseline"
+      is="uv-feedback-box"
+      data-test-id="feedback-box"
+    >
+      <div th:text="${text}"></div>
+      <div>
+        <button class="flex items-center bg-transparent" th:commandfor="${id}" command="close">
+          <svg th:replace="~{icon/x-circle::svg(className='w-5 h-5')}"></svg>
+          <span class="sr-only" th:text="#{feedback-box.close}">Hinweis Schließen</span>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>
