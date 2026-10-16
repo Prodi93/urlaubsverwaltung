@@ -128,6 +128,15 @@ class PresenceCalendarUIIT {
 
         assertThat(page.locator(day)).hasAttribute("data-fork-presence", "planned");
 
+        // the week box switches to the next week and plans a day there
+        page.locator("[data-test-id=presence-week-next]").click();
+        page.waitForURL(url -> url.contains("presenceWeek="));
+        assertThat(page.locator("[data-test-id=presence-week-current]")).isVisible();
+        page.locator("[data-test-id=presence-week-box] form button[value=HOME_OFFICE]").first().click();
+        page.waitForURL(url -> url.contains("presenceWeek="));
+        assertThat(page.locator("[data-test-id=presence-week-current]")).isVisible();
+        assertThat(page.locator("[data-test-id=presence-week-box] [data-presence-kind=PRESENCE]").first()).isVisible();
+
         navigationPage.logout();
     }
 

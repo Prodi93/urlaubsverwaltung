@@ -30,7 +30,7 @@
         <!-- LI fork: presence of the current week and planning in the calendar -->
         <th:block
           th:if="${forkPresenceWeek != null}"
-          th:insert="~{fork/presence/week-box::week-box(personId=${person.id}, days=${forkPresenceWeek}, presenceTypes=${forkPresenceTypes})}"
+          th:insert="~{fork/presence/week-box::week-box(personId=${person.id}, days=${forkPresenceWeek}, presenceTypes=${forkPresenceTypes}, navigation=${forkPresenceWeekNavigation})}"
         ></th:block>
 
         <div id="datepicker" class="flex justify-center items-center">

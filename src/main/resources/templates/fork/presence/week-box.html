@@ -5,7 +5,7 @@
   </head>
   <body>
     <!-- presence of the current week on the person overview, and the form used by the calendar menu -->
-    <th:block th:fragment="week-box(personId, days, presenceTypes)">
+    <th:block th:fragment="week-box(personId, days, presenceTypes, navigation)">
       <form
         id="fork-presence-range-form"
         method="post"
@@ -21,14 +21,54 @@
         <input type="hidden" name="to" />
         <input type="hidden" name="type" />
         <input type="hidden" name="returnTo" value="overview" />
+        <input type="hidden" name="week" th:value="${navigation.monday}" />
       </form>
 
-      <section class="mb-8" data-test-id="presence-week-box">
-        <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
-          <h2 class="text-lg font-medium" th:text="#{fork.presence.week.title}">Anwesenheit diese Woche</h2>
+      <section id="presence-week" class="mb-8 scroll-mt-20" data-test-id="presence-week-box">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <div class="flex items-center gap-2">
+            <a
+              class="icon-link p-1"
+              th:href="${navigation.previousUrl}"
+              th:title="#{fork.presence.week.previous}"
+              data-test-id="presence-week-previous"
+            >
+              <svg th:replace="~{icon/chevron-left::svg(className='w-5 h-5')}" />
+              <span class="sr-only" th:text="#{fork.presence.week.previous}"></span>
+            </a>
+            <h2 class="text-lg font-medium" data-test-id="presence-week-title">
+              <th:block
+                th:text="${navigation.current} ? #{fork.presence.week.title} : #{fork.presence.week.titleOther(${navigation.weekNumber})}"
+              >
+                Anwesenheit diese Woche
+              </th:block>
+              <span
+                class="text-sm font-normal text-black/75 dark:text-zinc-300"
+                th:text="|#{fork.presence.week.number(${navigation.weekNumber})}, ${#temporals.format(navigation.monday, 'dd.MM.')}–${#temporals.format(navigation.sunday, 'dd.MM.yyyy')}|"
+                >KW 43, 19.10.–25.10.2026</span
+              >
+            </h2>
+            <a
+              class="icon-link p-1"
+              th:href="${navigation.nextUrl}"
+              th:title="#{fork.presence.week.next}"
+              data-test-id="presence-week-next"
+            >
+              <svg th:replace="~{icon/chevron-right::svg(className='w-5 h-5')}" />
+              <span class="sr-only" th:text="#{fork.presence.week.next}"></span>
+            </a>
+            <a
+              th:unless="${navigation.current}"
+              class="icon-link text-sm"
+              th:href="${navigation.currentUrl}"
+              th:text="#{fork.presence.week.current}"
+              data-test-id="presence-week-current"
+              >Diese Woche</a
+            >
+          </div>
           <a
             class="icon-link text-sm"
-            th:href="@{/web/presence/persons/{id} (id=${personId})}"
+            th:href="@{/web/presence/persons/{id} (id=${personId}, year=${navigation.monday.year}, month=${navigation.monday.monthValue})}"
             th:text="#{fork.presence.planning.link}"
             >Ganzen Monat planen</a
           >
@@ -58,6 +98,7 @@
             >
               <input type="hidden" name="from" th:value="${planningDay.date}" />
               <input type="hidden" name="returnTo" value="overview" />
+              <input type="hidden" name="week" th:value="${navigation.monday}" />
               <button
                 th:each="presenceType : ${presenceTypes}"
                 type="submit"

@@ -151,6 +151,7 @@ class PresenceViewController implements HasLaunchpad, HasPersonSearch {
                     @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DATE) LocalDate to,
                     @RequestParam(value = "type", required = false) PresenceType type,
                     @RequestParam(value = "returnTo", defaultValue = "overview") String returnTo,
+                    @RequestParam(value = "week", required = false) @DateTimeFormat(iso = DATE) LocalDate week,
                     RedirectAttributes redirectAttributes, Locale locale) throws UnknownPersonException {
 
         final Person person = getEditablePerson(personId);
@@ -164,7 +165,10 @@ class PresenceViewController implements HasLaunchpad, HasPersonSearch {
         return switch (returnTo) {
             case "planning" -> "redirect:/web/presence/persons/%s?year=%s&month=%s".formatted(personId, from.getYear(), from.getMonthValue());
             case "presence" -> "redirect:/web/presence?year=%s&month=%s".formatted(from.getYear(), from.getMonthValue());
-            default -> "redirect:/web/person/%s/overview?year=%s".formatted(personId, from.getYear());
+            default -> week == null
+                ? "redirect:/web/person/%s/overview?year=%s".formatted(personId, from.getYear())
+                : "redirect:/web/person/%s/overview?year=%s&%s=%s#%s".formatted(personId, from.getYear(),
+                    PresenceWeekDataProvider.WEEK_PARAMETER, week, PresenceWeekDataProvider.BOX_ANCHOR);
         };
     }
 
