@@ -123,6 +123,12 @@
             </th:block>
           </div>
         </div>
+        <!-- LI fork: part time free days -->
+        <div
+          th:if="${forkPartTimeFreeDays != null}"
+          class="w-full @2xl/main:w-1/2 @5xl/main:w-1/3 @5xl/main:mt-8"
+          th:insert="~{fork/parttime/overview-box::box(summary=${forkPartTimeFreeDays}, personId=${person.id})}"
+        ></div>
       </div>
     </th:block>
   </body>

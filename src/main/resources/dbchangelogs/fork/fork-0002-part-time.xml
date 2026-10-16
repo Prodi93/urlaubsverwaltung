@@ -1,0 +1,71 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+  <changeSet author="prodi" id="fork-0002-part-time--table">
+
+    <createSequence cacheSize="1" cycle="false" dataType="bigint" incrementBy="10" maxValue="9223372036854775807"
+                    minValue="1" sequenceName="fork_part_time_id_seq" startValue="1"/>
+
+    <createTable tableName="fork_part_time">
+      <column name="tenant_id" type="text"/>
+      <column name="id" type="bigint">
+        <constraints primaryKey="true" nullable="false" primaryKeyName="fork_part_time_pkey"/>
+      </column>
+      <column name="person_id" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <column name="valid_from" type="date">
+        <constraints nullable="false"/>
+      </column>
+      <column name="percentage" type="numeric(5,2)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint baseTableName="fork_part_time"
+                             baseColumnNames="person_id"
+                             constraintName="fk_fork_part_time_person"
+                             referencedTableName="person"
+                             referencedColumnNames="id"
+                             onDelete="CASCADE"/>
+
+    <addUniqueConstraint tableName="fork_part_time" columnNames="person_id, valid_from"
+                         constraintName="uc_fork_part_time_person_valid_from"/>
+
+    <sql>ALTER TABLE fork_part_time ADD CONSTRAINT chk_fork_part_time_percentage CHECK (percentage &gt; 0 AND percentage &lt;= 100)</sql>
+  </changeSet>
+
+  <changeSet author="prodi" id="fork-0002-part-time--quota-table">
+
+    <createSequence cacheSize="1" cycle="false" dataType="bigint" incrementBy="10" maxValue="9223372036854775807"
+                    minValue="1" sequenceName="fork_part_time_quota_id_seq" startValue="1"/>
+
+    <createTable tableName="fork_part_time_quota">
+      <column name="tenant_id" type="text"/>
+      <column name="id" type="bigint">
+        <constraints primaryKey="true" nullable="false" primaryKeyName="fork_part_time_quota_pkey"/>
+      </column>
+      <column name="person_id" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <column name="year" type="int">
+        <constraints nullable="false"/>
+      </column>
+      <column name="override_days" type="numeric(5,1)"/>
+      <column name="comment" type="text"/>
+    </createTable>
+
+    <addForeignKeyConstraint baseTableName="fork_part_time_quota"
+                             baseColumnNames="person_id"
+                             constraintName="fk_fork_part_time_quota_person"
+                             referencedTableName="person"
+                             referencedColumnNames="id"
+                             onDelete="CASCADE"/>
+
+    <addUniqueConstraint tableName="fork_part_time_quota" columnNames="person_id, year"
+                         constraintName="uc_fork_part_time_quota_person_year"/>
+  </changeSet>
+
+</databaseChangeLog>

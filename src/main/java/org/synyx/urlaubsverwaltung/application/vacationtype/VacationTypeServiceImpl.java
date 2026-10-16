@@ -24,6 +24,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static org.synyx.urlaubsverwaltung.application.vacationtype.VacationCategory.HOLIDAY;
 import static org.synyx.urlaubsverwaltung.application.vacationtype.VacationCategory.OTHER;
 import static org.synyx.urlaubsverwaltung.application.vacationtype.VacationCategory.OVERTIME;
+import static org.synyx.urlaubsverwaltung.application.vacationtype.VacationCategory.PARTTIME_FREEDAY;
 import static org.synyx.urlaubsverwaltung.application.vacationtype.VacationCategory.SPECIALLEAVE;
 import static org.synyx.urlaubsverwaltung.application.vacationtype.VacationCategory.UNPAIDLEAVE;
 import static org.synyx.urlaubsverwaltung.application.vacationtype.VacationTypeColor.YELLOW;
@@ -182,8 +183,10 @@ public class VacationTypeServiceImpl implements VacationTypeService {
         final ProvidedVacationType training = createProvidedVacationType(false, OTHER, "application.data.vacationType.training", true, true, YELLOW, false);
         final ProvidedVacationType employmentBan = createProvidedVacationType(false, OTHER, "application.data.vacationType.employmentBan", true, true, YELLOW, false);
         final ProvidedVacationType educationalLeave = createProvidedVacationType(false, OTHER, "application.data.vacationType.educationalLeave", true, true, YELLOW, false);
+        // LI fork: part time without fixed day off
+        final ProvidedVacationType partTimeFreeDay = createProvidedVacationType(false, PARTTIME_FREEDAY, "application.data.vacationType.parttimeFreeday", true, true, YELLOW, false);
 
-        return List.of(holiday, specialleave, unpaidleave, overtime, parentalLeave, maternityProtection, sabbatical, paidLeave, cure, education, homeOffice, mobileOffice, outOfOffice, training, employmentBan, educationalLeave);
+        return List.of(holiday, specialleave, unpaidleave, overtime, parentalLeave, maternityProtection, sabbatical, paidLeave, cure, education, homeOffice, mobileOffice, outOfOffice, training, employmentBan, educationalLeave, partTimeFreeDay);
     }
 
     private ProvidedVacationType createProvidedVacationType(boolean active, VacationCategory category, String messageKey, boolean requiresApprovalToApply, boolean requiresApprovalToCancel, VacationTypeColor color, boolean visibleToEveryone) {

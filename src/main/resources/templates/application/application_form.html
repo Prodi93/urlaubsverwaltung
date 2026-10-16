@@ -133,6 +133,16 @@
                 </select>
               </div>
 
+              <!-- LI fork: part time free days -->
+              <div th:if="${forkPartTimeFreeDays != null}" class="uv-form__input-row">
+                <span></span>
+                <p
+                  class="text-sm text-black/75 dark:text-zinc-300"
+                  th:text="#{fork.parttime.application.left(${forkPartTimeFreeDays.year}, ${forkPartTimeFreeDays.left})}"
+                  data-test-id="parttime-left-hint"
+                ></p>
+              </div>
+
               <div class="uv-form__input-row">
                 <label for="from" class="is-required" th:text="|#{absence.period.startDate}:|"> Von </label>
                 <div>

@@ -364,7 +364,7 @@ class VacationTypeServiceImplTest {
 
         assertThat(captor.getValue())
             .extracting(VacationTypeEntity::getMessageKey)
-            .contains("application.data.vacationType.mobileOffice");
+            .contains("application.data.vacationType.mobileOffice", "application.data.vacationType.parttimeFreeday");
     }
 
     @Test
@@ -418,7 +418,8 @@ class VacationTypeServiceImplTest {
                 "application.data.vacationType.outOfOffice",
                 "application.data.vacationType.training",
                 "application.data.vacationType.employmentBan",
-                "application.data.vacationType.educationalLeave"
+                "application.data.vacationType.educationalLeave",
+                "application.data.vacationType.parttimeFreeday"
             )
             .filter(messageKey -> !messageKey.equals(excludedMessageKey))
             .map(messageKey -> {

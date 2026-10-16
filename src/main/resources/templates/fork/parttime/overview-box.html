@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title></title>
+  </head>
+  <body>
+    <th:block th:fragment="box(summary, personId)">
+      <div th:replace="~{fragments/box::box-with-icon(~{::parttime-box-icon}, ~{::parttime-box-body})}">
+        <th:block th:ref="parttime-box-icon">
+          <div
+            th:replace="~{fragments/rounded::block(content=~{::parttime-box-icon-rounded}, className='bg-sky-500 text-white dark:bg-sky-400 dark:text-zinc-900')}"
+          >
+            <th:block th:ref="parttime-box-icon-rounded">
+              <svg th:replace="~{icon/clock::svg(className='w-8 h-8')}" />
+            </th:block>
+          </div>
+        </th:block>
+        <th:block th:ref="parttime-box-body">
+          <span class="text-sm text-black/75 dark:text-zinc-300" th:text="#{fork.parttime.box.left.1}">Es verbleiben</span>
+          <a
+            class="my-1 text-lg font-medium"
+            th:href="@{/web/person/{personId}/parttime (personId=${personId}, year=${summary.year})}"
+            th:text="#{fork.parttime.box.left.2(${summary.left})}"
+            data-test-id="parttime-box-left"
+          >
+            7,5 Teilzeit-Freitage
+          </a>
+          <span class="text-sm text-black/75 dark:text-zinc-300" th:text="#{fork.parttime.box.quota(${summary.quota}, ${summary.used}, ${summary.waiting})}">
+            von 10,5 (2 genommen, 1 beantragt)
+          </span>
+        </th:block>
+      </div>
+    </th:block>
+  </body>
+</html>

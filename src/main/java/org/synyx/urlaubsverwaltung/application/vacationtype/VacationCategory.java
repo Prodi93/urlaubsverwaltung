@@ -9,5 +9,9 @@ public enum VacationCategory {
     SPECIALLEAVE,
     UNPAIDLEAVE,
     OVERTIME,
-    OTHER
+    OTHER,
+    /**
+     * Part time without fixed day off (LI fork): uses the part time free days quota instead of vacation days.
+     */
+    PARTTIME_FREEDAY
 }

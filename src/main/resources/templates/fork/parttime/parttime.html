@@ -1,0 +1,161 @@
+<!doctype html>
+<html
+  lang="en"
+  th:lang="${language}"
+  th:class="|theme-${theme}|"
+  th:data-nav-collapsed="${navigationCollapsed ? 'true' : null}"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:asset="http://www.w3.org/1999/xhtml"
+>
+  <head th:replace="~{_layout::head(title=~{::title}, scriptsDefer=~{::scriptsDefer}, preload=~{::preload})}">
+    <title th:replace="~{fragments/page-title::page-title(#{fork.parttime.title(${person.niceName})})}"></title>
+    <th:block th:fragment="preload">
+      <link rel="preload" th:replace="~{fragments/asset-dependency-preload::links('person.js')}" />
+    </th:block>
+    <th:block th:fragment="scriptsDefer">
+      <script defer type="module" asset:src="person.js"></script>
+    </th:block>
+  </head>
+  <body th:replace="~{_layout::body(content=~{::main})}">
+    <main th:fragment="main" class="content-container content--max-w">
+      <div th:if="${partTimeSaved}" class="mb-4">
+        <div th:replace="~{fragments/feedback-box::feedback-box-success(body=#{fork.parttime.saved})}"></div>
+      </div>
+      <div th:if="${partTimeDeleted}" class="mb-4">
+        <div th:replace="~{fragments/feedback-box::feedback-box-success(body=#{fork.parttime.deleted})}"></div>
+      </div>
+      <div th:if="${quotaSaved}" class="mb-4">
+        <div th:replace="~{fragments/feedback-box::feedback-box-success(body=#{fork.parttime.quota.saved})}"></div>
+      </div>
+
+      <div th:replace="~{fragments/section-heading::section-heading(~{::parttime-heading-body}, ~{::parttime-heading-actions})}">
+        <th:block th:ref="parttime-heading-body">
+          <h1 th:text="#{fork.parttime.title(${person.niceName})}">Teilzeit von Marlene Muster</h1>
+          <div
+            th:replace="~{fragments/year-selector::year-selector(id='year-selection', currentYear=${currentYear}, hrefPrefix=|/web/person/${person.id}/parttime?year=|, selectedYear=${selectedYear})}"
+          ></div>
+        </th:block>
+        <th:block th:ref="parttime-heading-actions">
+          <a class="icon-link flex items-center" th:href="@{/web/person/{personId}/overview (personId=${person.id}, year=${selectedYear})}">
+            <svg th:replace="~{icon/user-circle::svg(className='h-5 w-5')}" />&nbsp;
+            <span th:text="#{fork.parttime.back}">Zur Übersicht</span>
+          </a>
+        </th:block>
+      </div>
+
+      <p class="uv-help-block mb-8">
+        <svg th:replace="~{icon/info::svg(className='uv-help-block-icon')}"></svg>
+        <th:block th:text="#{fork.parttime.description}">Beschreibung</th:block>
+      </p>
+
+      <!-- quota of the selected year -->
+      <section class="mb-12" data-test-id="parttime-summary">
+        <h2 class="text-xl font-medium mb-4" th:text="#{fork.parttime.summary.title(${selectedYear})}">Teilzeit-Freitage 2026</h2>
+        <dl class="grid grid-cols-2 @2xl/main:grid-cols-5 gap-4 text-sm">
+          <div>
+            <dt class="text-black/75 dark:text-zinc-300" th:text="#{fork.parttime.summary.computed}">Berechnet</dt>
+            <dd class="text-lg font-medium" th:text="${#numbers.formatDecimal(summary.computed, 1, 'DEFAULT', 1, 'DEFAULT')}">10,5</dd>
+          </div>
+          <div>
+            <dt class="text-black/75 dark:text-zinc-300" th:text="#{fork.parttime.summary.quota}">Kontingent</dt>
+            <dd class="text-lg font-medium">
+              <span th:text="${#numbers.formatDecimal(summary.quota, 1, 'DEFAULT', 1, 'DEFAULT')}">10,5</span>
+              <span th:if="${summary.overridden}" class="text-sm text-black/75 dark:text-zinc-300" th:text="#{fork.parttime.summary.overridden}">(korrigiert)</span>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-black/75 dark:text-zinc-300" th:text="#{fork.parttime.summary.used}">Genommen</dt>
+            <dd class="text-lg font-medium" th:text="${#numbers.formatDecimal(summary.used, 1, 'DEFAULT', 1, 'DEFAULT')}">2</dd>
+          </div>
+          <div>
+            <dt class="text-black/75 dark:text-zinc-300" th:text="#{fork.parttime.summary.waiting}">Beantragt</dt>
+            <dd class="text-lg font-medium" th:text="${#numbers.formatDecimal(summary.waiting, 1, 'DEFAULT', 1, 'DEFAULT')}">1</dd>
+          </div>
+          <div>
+            <dt class="text-black/75 dark:text-zinc-300" th:text="#{fork.parttime.summary.left}">Verbleibend</dt>
+            <dd class="text-lg font-medium" th:text="${#numbers.formatDecimal(summary.left, 1, 'DEFAULT', 1, 'DEFAULT')}">7,5</dd>
+          </div>
+        </dl>
+        <p th:if="${summary.comment.present}" class="text-sm mt-2" th:text="|#{fork.parttime.quota.comment}: ${summary.comment.get()}|"></p>
+
+        <form
+          th:if="${canEdit}"
+          method="post"
+          th:action="@{/web/person/{personId}/parttime/quota/{year} (personId=${person.id}, year=${selectedYear})}"
+          th:object="${quotaForm}"
+          class="mt-6 flex flex-wrap items-end gap-4"
+          data-test-id="parttime-quota-form"
+        >
+          <div class="flex flex-col">
+            <label for="overrideDays" class="text-sm" th:text="#{fork.parttime.quota.overrideDays}">Korrektur (Tage)</label>
+            <input id="overrideDays" type="text" inputmode="decimal" th:field="*{overrideDays}" th:errorclass="error" class="w-32" />
+            <p th:if="${#fields.hasErrors('overrideDays')}" th:errors="*{overrideDays}" class="uv-form__input-error"></p>
+          </div>
+          <div class="flex flex-col grow">
+            <label for="comment" class="text-sm" th:text="#{fork.parttime.quota.comment}">Kommentar</label>
+            <input id="comment" type="text" maxlength="255" th:field="*{comment}" />
+          </div>
+          <button type="submit" class="button" th:text="#{fork.parttime.quota.save}">Korrektur speichern</button>
+        </form>
+        <p th:if="${canEdit}" class="text-sm text-black/75 dark:text-zinc-300 mt-2" th:text="#{fork.parttime.quota.help}"></p>
+      </section>
+
+      <!-- part time history -->
+      <section class="mb-12">
+        <h2 class="text-xl font-medium mb-4" th:text="#{fork.parttime.history.title}">Teilzeit-Historie</h2>
+        <p th:if="${#lists.isEmpty(partTimes)}" class="text-sm" th:text="#{fork.parttime.history.empty}">Keine Teilzeit hinterlegt.</p>
+        <table th:if="${not #lists.isEmpty(partTimes)}" class="list-table striped-table bordered-table text-sm" data-test-id="parttime-history">
+          <thead>
+            <tr>
+              <th scope="col" th:text="#{fork.parttime.history.validFrom}">Gültig ab</th>
+              <th scope="col" th:text="#{fork.parttime.history.percentage}">Pensum</th>
+              <th scope="col" th:if="${canEdit}"><span class="sr-only" th:text="#{fork.parttime.history.actions}"></span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="partTime : ${partTimes}">
+              <td th:text="${#temporals.format(partTime.validFrom, 'dd.MM.yyyy')}">01.01.2026</td>
+              <td th:text="|${#numbers.formatDecimal(partTime.percentage, 1, 'DEFAULT', 0, 'DEFAULT')} %|">80 %</td>
+              <td th:if="${canEdit}" class="text-right">
+                <form
+                  method="post"
+                  th:action="@{/web/person/{personId}/parttime/{id}/delete (personId=${person.id}, id=${partTime.id})}"
+                >
+                  <button type="submit" class="icon-link" th:title="#{fork.parttime.history.delete}">
+                    <svg th:replace="~{icon/trash-2::svg(className='w-5 h-5')}" />
+                    <span class="sr-only" th:text="#{fork.parttime.history.delete}">Löschen</span>
+                  </button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- new part time -->
+      <section th:if="${canEdit}">
+        <h2 class="text-xl font-medium mb-4" th:text="#{fork.parttime.form.title}">Teilzeit erfassen</h2>
+        <form
+          method="post"
+          th:action="@{/web/person/{personId}/parttime (personId=${person.id})}"
+          th:object="${partTimeForm}"
+          class="flex flex-wrap items-end gap-4"
+          data-test-id="parttime-form"
+        >
+          <div class="flex flex-col">
+            <label for="validFrom" class="text-sm is-required" th:text="#{fork.parttime.history.validFrom}">Gültig ab</label>
+            <input id="validFrom" type="date" th:field="*{validFrom}" th:errorclass="error" required />
+            <p th:if="${#fields.hasErrors('validFrom')}" th:errors="*{validFrom}" class="uv-form__input-error"></p>
+          </div>
+          <div class="flex flex-col">
+            <label for="percentage" class="text-sm is-required" th:text="#{fork.parttime.form.percentage}">Pensum (%)</label>
+            <input id="percentage" type="text" inputmode="decimal" th:field="*{percentage}" th:errorclass="error" class="w-24" required />
+            <p th:if="${#fields.hasErrors('percentage')}" th:errors="*{percentage}" class="uv-form__input-error"></p>
+          </div>
+          <button type="submit" class="button-main-green" th:text="#{action.save}">Speichern</button>
+        </form>
+        <p class="text-sm text-black/75 dark:text-zinc-300 mt-2" th:text="#{fork.parttime.form.help}"></p>
+      </section>
+    </main>
+  </body>
+</html>

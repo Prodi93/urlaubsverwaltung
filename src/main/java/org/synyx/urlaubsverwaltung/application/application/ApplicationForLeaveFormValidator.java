@@ -7,6 +7,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.synyx.urlaubsverwaltung.application.settings.ApplicationSettings;
 import org.synyx.urlaubsverwaltung.application.vacationtype.VacationType;
+import org.synyx.urlaubsverwaltung.fork.application.AdditionalApplicationValidator;
 import org.synyx.urlaubsverwaltung.application.vacationtype.VacationTypeService;
 import org.synyx.urlaubsverwaltung.overlap.OverlapCase;
 import org.synyx.urlaubsverwaltung.overlap.OverlapService;
@@ -86,8 +87,8 @@ class ApplicationForLeaveFormValidator implements Validator {
     private final VacationTypeService vacationTypeService;
     private final ApplicationMapper applicationMapper;
     private final Clock clock;
+    private final List<AdditionalApplicationValidator> additionalApplicationValidators;
 
-    @Autowired
     ApplicationForLeaveFormValidator(
         WorkingTimeService workingTimeService,
         WorkDaysCountService workDaysCountService,
@@ -99,6 +100,23 @@ class ApplicationForLeaveFormValidator implements Validator {
         ApplicationMapper applicationMapper,
         Clock clock
     ) {
+        this(workingTimeService, workDaysCountService, overlapService, calculationService, settingsService, overtimeService,
+            vacationTypeService, applicationMapper, clock, List.of());
+    }
+
+    @Autowired
+    ApplicationForLeaveFormValidator(
+        WorkingTimeService workingTimeService,
+        WorkDaysCountService workDaysCountService,
+        OverlapService overlapService,
+        CalculationService calculationService,
+        SettingsService settingsService,
+        OvertimeService overtimeService,
+        VacationTypeService vacationTypeService,
+        ApplicationMapper applicationMapper,
+        Clock clock,
+        List<AdditionalApplicationValidator> additionalApplicationValidators
+    ) {
         this.workingTimeService = workingTimeService;
         this.workDaysCountService = workDaysCountService;
         this.overlapService = overlapService;
@@ -108,6 +126,7 @@ class ApplicationForLeaveFormValidator implements Validator {
         this.vacationTypeService = vacationTypeService;
         this.applicationMapper = applicationMapper;
         this.clock = clock;
+        this.additionalApplicationValidators = additionalApplicationValidators;
     }
 
     @Override
@@ -379,6 +398,11 @@ class ApplicationForLeaveFormValidator implements Validator {
          */
         if (!enoughOvertimeHoursLeft(applicationForm, settings, vacationType)) {
             errors.reject(ERROR_NOT_ENOUGH_OVERTIME);
+        }
+
+        if (!additionalApplicationValidators.isEmpty()) {
+            final Application application = applicationMapper.mapToApplication(applicationForm);
+            additionalApplicationValidators.forEach(validator -> validator.validate(application, vacationType, errors));
         }
     }
 

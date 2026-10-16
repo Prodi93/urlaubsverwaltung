@@ -8,5 +8,6 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
   <include relativeToChangelogFile="true" file="fork-0001-migrate-malta-to-liechtenstein.xml"/>
+  <include relativeToChangelogFile="true" file="fork-0002-part-time.xml"/>
 
 </databaseChangeLog>
