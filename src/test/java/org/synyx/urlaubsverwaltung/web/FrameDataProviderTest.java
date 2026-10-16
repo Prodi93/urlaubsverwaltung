@@ -106,6 +106,7 @@ class FrameDataProviderTest {
                     basicApplicationLink(),
                     basicAbsenceOverviewLink(),
                     basicPresenceLink(),
+                    basicImportExportLink(),
                     basicAbsenceLink(),
                     basicSickNoteLink(),
                     basicOvertimeLink()
@@ -326,6 +327,7 @@ class FrameDataProviderTest {
                     basicApplicationLink(),
                     basicAbsenceOverviewLink(),
                     basicPresenceLink(),
+                    basicImportExportLink(),
                     basicAbsenceLink(),
                     basicSickNoteLink(),
                     basicOvertimeLink()
@@ -376,6 +378,7 @@ class FrameDataProviderTest {
                     basicApplicationLink(),
                     basicAbsenceOverviewLink(),
                     basicPresenceLink(),
+                    basicImportExportLink(),
                     basicAbsenceLink(),
                     basicSickNoteLink(),
                     basicOvertimeLink()
@@ -425,6 +428,7 @@ class FrameDataProviderTest {
                     basicApplicationLink(),
                     basicAbsenceOverviewLink(),
                     basicPresenceLink(),
+                    basicImportExportLink(),
                     basicAbsenceLink(),
                     basicSickNoteLink(),
                     basicOvertimeLink()
@@ -473,6 +477,7 @@ class FrameDataProviderTest {
                     basicApplicationLink(),
                     basicAbsenceOverviewLink(),
                     basicPresenceLink(),
+                    basicImportExportLink(),
                     basicAbsenceLink(),
                     basicSickNoteLink(),
                     basicOvertimeLink()
@@ -522,6 +527,7 @@ class FrameDataProviderTest {
                     basicApplicationLink(),
                     basicAbsenceOverviewLink(),
                     basicPresenceLink(),
+                    basicImportExportLink(),
                     basicAbsenceLink(),
                     basicSickNoteLink(),
                     basicOvertimeLink()
@@ -783,6 +789,10 @@ class FrameDataProviderTest {
 
     private static NavigationItemDto basicAbsenceOverviewLink() {
         return basicAbsenceOverviewLink(false);
+    }
+
+    private static NavigationItemDto basicImportExportLink() {
+        return new NavigationItemDto("basic-import-export-link", "/web/import-export", "nav.basic.import-export", "download", false);
     }
 
     private static NavigationItemDto basicPresenceLink() {

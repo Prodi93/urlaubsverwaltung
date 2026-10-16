@@ -1,0 +1,141 @@
+<!doctype html>
+<html
+  lang="en"
+  th:lang="${language}"
+  th:class="|theme-${theme}|"
+  th:data-nav-collapsed="${navigationCollapsed ? 'true' : null}"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:asset="http://www.w3.org/1999/xhtml"
+>
+  <head th:replace="~{_layout::head(title=~{::title}, scriptsDefer=~{::scriptsDefer}, preload=~{::preload})}">
+    <title th:replace="~{fragments/page-title::page-title(#{fork.csv.title})}"></title>
+    <th:block th:fragment="preload">
+      <link rel="preload" th:replace="~{fragments/asset-dependency-preload::links('fork_presence.js')}" />
+    </th:block>
+    <th:block th:fragment="scriptsDefer">
+      <script defer type="module" asset:src="fork_presence.js"></script>
+    </th:block>
+  </head>
+  <body th:replace="~{_layout::body(content=~{::main})}">
+    <main th:fragment="main" class="content-container content--max-w">
+      <h1 class="text-2xl font-medium mb-6" th:text="#{fork.csv.title}">Import / Export</h1>
+
+      <!-- export -->
+      <section class="mb-12" data-test-id="csv-export">
+        <h2 class="text-xl font-medium mb-2" th:text="#{fork.csv.export.title}">Export</h2>
+        <p class="text-sm text-black/75 dark:text-zinc-300 mb-4" th:text="#{fork.csv.export.description}"></p>
+        <form method="get" th:action="@{/web/import-export/export}" class="flex flex-wrap items-end gap-4">
+          <div class="flex flex-col">
+            <label for="export-dataset" class="text-sm" th:text="#{fork.csv.dataset}">Daten</label>
+            <select id="export-dataset" name="dataset" class="w-56">
+              <option th:each="dataset : ${datasets}" th:value="${dataset.name}" th:text="#{${'fork.csv.dataset.' + dataset.name}}"></option>
+            </select>
+          </div>
+          <div class="flex flex-col">
+            <label for="export-scope" class="text-sm" th:text="#{fork.csv.scope}">Für</label>
+            <select id="export-scope" name="scope" class="w-48">
+              <option th:each="scope : ${scopes}" th:value="${scope.name}" th:text="#{${'fork.csv.scope.' + scope.name}}"></option>
+            </select>
+          </div>
+          <div th:if="${not #lists.isEmpty(departments)}" class="flex flex-col">
+            <label for="export-department" class="text-sm" th:text="#{fork.csv.department}">Abteilung</label>
+            <select id="export-department" name="department" class="w-48">
+              <option th:each="department : ${departments}" th:value="${department.id}" th:text="${department.name}"></option>
+            </select>
+          </div>
+          <div class="flex flex-col">
+            <label for="export-from" class="text-sm" th:text="#{fork.csv.from}">Von</label>
+            <input id="export-from" name="from" type="date" th:value="${exportFrom}" required />
+          </div>
+          <div class="flex flex-col">
+            <label for="export-to" class="text-sm" th:text="#{fork.csv.to}">Bis</label>
+            <input id="export-to" name="to" type="date" th:value="${exportTo}" required />
+          </div>
+          <button type="submit" class="button-main-green flex items-center gap-2">
+            <svg th:replace="~{icon/download::svg(className='w-4 h-4')}" />
+            <span th:text="#{fork.csv.export.action}">Exportieren</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- import (office) -->
+      <section th:if="${canImport}" data-test-id="csv-import">
+        <h2 class="text-xl font-medium mb-2" th:text="#{fork.csv.import.title}">Import</h2>
+        <p class="text-sm text-black/75 dark:text-zinc-300 mb-2" th:text="#{fork.csv.import.description}"></p>
+        <ul class="text-sm text-black/75 dark:text-zinc-300 mb-4 list-disc pl-5">
+          <li th:each="dataset : ${datasets}">
+            <a class="icon-link" th:href="@{/web/import-export/template (dataset=${dataset.name})}" th:text="#{${'fork.csv.dataset.' + dataset.name}}"></a>:
+            <span th:text="#{${'fork.csv.import.help.' + dataset.name}}"></span>
+          </li>
+        </ul>
+
+        <form method="post" th:action="@{/web/import-export/import}" enctype="multipart/form-data" class="flex flex-wrap items-end gap-4 mb-8">
+          <div class="flex flex-col">
+            <label for="import-dataset" class="text-sm" th:text="#{fork.csv.dataset}">Daten</label>
+            <select id="import-dataset" name="dataset" class="w-56">
+              <option
+                th:each="dataset : ${datasets}"
+                th:value="${dataset.name}"
+                th:text="#{${'fork.csv.dataset.' + dataset.name}}"
+                th:selected="${importDataset == dataset}"
+              ></option>
+            </select>
+          </div>
+          <div class="flex flex-col">
+            <label for="import-file" class="text-sm" th:text="#{fork.csv.import.file}">CSV-Datei</label>
+            <input id="import-file" name="file" type="file" accept=".csv,text/csv" required />
+          </div>
+          <button type="submit" class="button" th:text="#{fork.csv.import.preview}">Prüfen</button>
+        </form>
+
+        <div th:if="${importError != null}" class="alert alert-danger mb-6" data-test-id="csv-import-error"
+             th:text="${#messages.msgWithParams(importError.messageKey, importError.arguments)}"></div>
+
+        <div th:if="${importResult != null}" data-test-id="csv-import-result">
+          <div th:if="${importResult.executed}" class="mb-4">
+            <div th:replace="~{fragments/feedback-box::feedback-box-success(body=#{fork.csv.import.executed(${importResult.created}, ${importResult.updated}, ${importResult.deleted}, ${importResult.unchanged}, ${importResult.errors})})}"></div>
+          </div>
+          <div th:if="${importAborted}" class="alert alert-danger mb-4" th:text="#{fork.csv.import.aborted}"></div>
+          <p th:unless="${importResult.executed}" class="mb-4" th:text="#{fork.csv.import.summary(${importResult.created}, ${importResult.updated}, ${importResult.deleted}, ${importResult.unchanged}, ${importResult.errors})}"></p>
+
+          <div class="overflow-x-auto mb-6">
+            <table class="list-table striped-table bordered-table text-sm">
+              <thead>
+                <tr>
+                  <th scope="col" th:text="#{fork.csv.import.line}">Zeile</th>
+                  <th scope="col" th:text="#{fork.csv.import.subject}">Person</th>
+                  <th scope="col" th:text="#{fork.csv.import.action}">Aktion</th>
+                  <th scope="col" th:text="#{fork.csv.import.message}">Hinweis</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="row : ${importResult.rows}" th:classappend="${row.error ? 'text-red-700 dark:text-red-400' : ''}">
+                  <td th:text="${row.line}">2</td>
+                  <td th:text="${row.subject}">muster</td>
+                  <td th:text="#{${'fork.csv.action.' + row.action.name}}">neu</td>
+                  <td th:text="${row.message != null ? #messages.msgWithParams(row.message, row.arguments) : ''}"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <form
+            th:if="${!importResult.executed && importContent != null && (importResult.hasChanges() || importResult.hasErrors())}"
+            method="post"
+            th:action="@{/web/import-export/import/execute}"
+            class="flex flex-wrap items-center gap-4"
+            data-test-id="csv-import-execute"
+          >
+            <input type="hidden" name="dataset" th:value="${importDataset.name}" />
+            <textarea name="content" class="hidden" th:text="${importContent}"></textarea>
+            <label th:if="${importResult.hasErrors()}" class="flex items-center gap-2 text-sm">
+              <input type="checkbox" name="skipErrors" value="true" class="uv-checkbox" />
+              <span th:text="#{fork.csv.import.skipErrors}">Zeilen mit Fehlern überspringen</span>
+            </label>
+            <button type="submit" class="button-main-green" th:text="#{fork.csv.import.execute}">Importieren</button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

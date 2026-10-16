@@ -11,8 +11,8 @@ für den Einsatz in Liechtenstein. Basis ist das jeweils letzte stabile Upstream
 | Mail über OAuth2 | SMTP mit XOAUTH2 (Microsoft 365 / Exchange Online) statt Benutzername/Passwort | [docs/mail-oauth2.md](docs/mail-oauth2.md) |
 | PWA | Installierbar auf Smartphone/Desktop, Offline-Seite, Shortcuts | – |
 | Teilzeit ohne festen freien Tag | Pensum pro Person (historisiert), automatisch berechnetes Kontingent an „Teilzeit-Freitagen“, eigene Abwesenheitsart | – |
-| Anwesenheit Büro/Homeoffice | *in Arbeit* | – |
-| CSV-Import/-Export | *in Arbeit* | – |
+| Anwesenheit Büro/Homeoffice | Tagesplanung (Büro, Homeoffice, mobil) mit Wochenmuster, Teamübersicht mit Anzahl „im Büro“, Schnell-Eintrag *Heute* für das Smartphone, REST-API `/api/persons/{id}/presences`. Zählt nicht als Abwesenheit. | – |
+| CSV-Import/-Export | Export für sich, Abteilung oder Unternehmen: Abwesenheiten, Urlaubskonten, Anwesenheiten, Personen & Arbeitszeiten (inkl. Teilzeit). Import (Office) mit Vorschau, alles oder nichts. | [docs/csv.md](docs/csv.md) |
 
 ## Branches, Versionen und Releases
 
@@ -49,19 +49,28 @@ liechtensteinischen Feiertage inkl. Bankfeiertage ersetzt. Der Fork migriert `MA
 `LIECHTENSTEIN_BANK_HOLIDAYS` (Liquibase `fork-0001`). Das gilt für die Firmeneinstellung und für Personen-Overrides. Die
 Feiertage sind identisch, die Urlaubssalden ändern sich also nicht.
 
-1. **Testlauf:** LXC klonen (oder DB-Dump in einen Test-LXC einspielen) und dort zuerst umstellen.
-2. Vorher Salden sichern, z. B. *Abwesenheiten → Statistik → CSV-Export* für das laufende Jahr.
-3. Update-Skript ersetzen: `fork/proxmox/ct-urlaubsverwaltung.sh` lädt Releases aus `Prodi93/urlaubsverwaltung`,
-   sichert DB und JAR nach `/opt/urlaubsverwaltung-backup/` und prüft nach dem Start `/actuator/health`.
-4. Update ausführen. Das LI-Skript wird nicht mehr aufgerufen.
-5. Prüfen:
+1. Proxmox-Snapshot des Containers anlegen.
+2. Im Container als root:
+
+   ```bash
+   curl -fsSLO https://raw.githubusercontent.com/Prodi93/urlaubsverwaltung/li/main/fork/proxmox/uv-fork-update.sh
+   bash uv-fork-update.sh
+   ```
+
+   Das Skript lädt das neueste Fork-Release und prüft die sha256-Summe. Danach stoppt es den Dienst, sichert DB und JAR
+   nach `/opt/urlaubsverwaltung-backup/`, tauscht die JAR und verschiebt den alten Malta-Hack (`custom/`, `.bak`) ins
+   Backup. Anschließend startet es den Dienst, wartet auf `/actuator/health` und zeigt die Feiertagsregion an. Zum
+   Schluss installiert es sich als `uv-fork-update` für spätere Updates.
+3. Prüfen:
    - *Einstellungen → Feiertage*: Region „Liechtenstein – Liechtenstein (inkl. Bankfeiertage)“
    - Kalender: 2.1., Fasnachtsdienstag und Karfreitag sind Feiertage.
-   - Salden mit dem Export aus Schritt 2 vergleichen.
-6. Aufräumen: `/opt/urlaubsverwaltung/custom/` und `/opt/urlaubsverwaltung/urlaubsverwaltung.bak` löschen.
+   - Neue Menüpunkte „Anwesenheit“ und „Import / Export“.
+4. **Updates künftig nur noch mit `uv-fork-update`**, nicht mehr mit dem `update`-Befehl der community-scripts.
+   Der würde das Upstream-Release installieren.
 
-**Rollback:** Service stoppen, den DB-Dump aus `/opt/urlaubsverwaltung-backup/db-*.sql.gz` einspielen und die alte JAR
-aus demselben Verzeichnis zurückkopieren. Sie enthält bereits den gepatchten Malta-Kalender.
+**Rollback:** Proxmox-Snapshot zurückspielen. Ohne Snapshot: Dienst stoppen, den DB-Dump aus
+`/opt/urlaubsverwaltung-backup/db-*.sql.gz` in eine leere Datenbank einspielen und die alte JAR aus demselben
+Verzeichnis zurückkopieren. Sie enthält bereits den gepatchten Malta-Kalender.
 
 ## Lokal entwickeln
 
