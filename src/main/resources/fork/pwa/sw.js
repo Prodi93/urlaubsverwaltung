@@ -40,8 +40,9 @@ self.addEventListener("activate", (event) => {
           .filter((key) => key.startsWith(CACHE_PREFIX) && key !== STATIC_CACHE && key !== OFFLINE_CACHE)
           .map((key) => caches.delete(key)),
       );
+      // no navigation preload: it does not work reliably with the redirects of the oidc login
       if (self.registration.navigationPreload) {
-        await self.registration.navigationPreload.enable();
+        await self.registration.navigationPreload.disable();
       }
       await self.clients.claim();
     })(),
@@ -60,19 +61,15 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (request.mode === "navigate") {
-    event.respondWith(networkOnlyWithOfflineFallback(event));
+    event.respondWith(networkOnlyWithOfflineFallback(request));
   } else if (STATIC_PATHS.some((path) => url.pathname.startsWith(path))) {
     event.respondWith(cacheFirst(request));
   }
 });
 
-async function networkOnlyWithOfflineFallback(event) {
+async function networkOnlyWithOfflineFallback(request) {
   try {
-    const preloadResponse = await event.preloadResponse;
-    if (preloadResponse) {
-      return preloadResponse;
-    }
-    return await fetch(event.request);
+    return await fetch(request);
   } catch {
     const cache = await caches.open(OFFLINE_CACHE);
     const offlineResponse = await cache.match(OFFLINE_URL);

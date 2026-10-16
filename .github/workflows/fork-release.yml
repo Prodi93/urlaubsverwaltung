@@ -32,8 +32,9 @@ jobs:
       - name: Set project version
         run: ./mvnw versions:set -DnewVersion=${{ steps.vars.outputs.version }} -DgenerateBackupPoms=false
 
+      # browser based ui tests are excluded like in the upstream build, they need playwright browsers
       - name: Build and test
-        run: ./mvnw verify
+        run: ./mvnw verify -Dgroups="!ui"
 
       - name: Create checksum
         run: |
