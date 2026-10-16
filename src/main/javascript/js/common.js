@@ -11,9 +11,11 @@ import "../components/textarea";
 import "../components/tooltip";
 import "./date-fns-localized";
 import { updateHtmlElementAttributes } from "./html-element";
+import { registerServiceWorker } from "./fork/pwa-register";
 
 // opt-in to turbo with `data-turbo="true"`
 Turbo.session.drive = false;
 
 initAutosubmit();
 updateHtmlElementAttributes(document);
+registerServiceWorker();
