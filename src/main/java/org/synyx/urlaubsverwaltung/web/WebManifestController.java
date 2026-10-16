@@ -46,6 +46,7 @@ class WebManifestController {
             "standalone",
             List.of(
                 new ShortcutDto(messageSource.getMessage("fork.pwa.shortcut.application.new", null, locale), "web/application/new", shortcutIcons),
+                new ShortcutDto(messageSource.getMessage("fork.pwa.shortcut.presence.today", null, locale), "web/presence/today", shortcutIcons),
                 new ShortcutDto(messageSource.getMessage("fork.pwa.shortcut.overview", null, locale), "web/overview", shortcutIcons)
             ),
             List.of(new RelatedApplicationDto("play", "https://play.google.com/store/apps/details?id=cloud.urlaubsverwaltung.mobile.urlaubsverwaltung"))

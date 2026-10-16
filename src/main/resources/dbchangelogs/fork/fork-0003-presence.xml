@@ -1,0 +1,72 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+  <changeSet author="prodi" id="fork-0003-presence--day-table">
+
+    <createSequence cacheSize="1" cycle="false" dataType="bigint" incrementBy="10" maxValue="9223372036854775807"
+                    minValue="1" sequenceName="fork_presence_day_id_seq" startValue="1"/>
+
+    <createTable tableName="fork_presence_day">
+      <column name="tenant_id" type="text"/>
+      <column name="id" type="bigint">
+        <constraints primaryKey="true" nullable="false" primaryKeyName="fork_presence_day_pkey"/>
+      </column>
+      <column name="person_id" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <column name="date" type="date">
+        <constraints nullable="false"/>
+      </column>
+      <column name="type" type="text">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint baseTableName="fork_presence_day" baseColumnNames="person_id"
+                             constraintName="fk_fork_presence_day_person"
+                             referencedTableName="person" referencedColumnNames="id" onDelete="CASCADE"/>
+
+    <addUniqueConstraint tableName="fork_presence_day" columnNames="person_id, date"
+                         constraintName="uc_fork_presence_day_person_date"/>
+
+    <createIndex tableName="fork_presence_day" indexName="idx_fork_presence_day_date">
+      <column name="date"/>
+    </createIndex>
+  </changeSet>
+
+  <changeSet author="prodi" id="fork-0003-presence--pattern-table">
+
+    <createSequence cacheSize="1" cycle="false" dataType="bigint" incrementBy="10" maxValue="9223372036854775807"
+                    minValue="1" sequenceName="fork_presence_pattern_id_seq" startValue="1"/>
+
+    <createTable tableName="fork_presence_pattern">
+      <column name="tenant_id" type="text"/>
+      <column name="id" type="bigint">
+        <constraints primaryKey="true" nullable="false" primaryKeyName="fork_presence_pattern_pkey"/>
+      </column>
+      <column name="person_id" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <column name="valid_from" type="date">
+        <constraints nullable="false"/>
+      </column>
+      <column name="monday" type="text"/>
+      <column name="tuesday" type="text"/>
+      <column name="wednesday" type="text"/>
+      <column name="thursday" type="text"/>
+      <column name="friday" type="text"/>
+      <column name="saturday" type="text"/>
+      <column name="sunday" type="text"/>
+    </createTable>
+
+    <addForeignKeyConstraint baseTableName="fork_presence_pattern" baseColumnNames="person_id"
+                             constraintName="fk_fork_presence_pattern_person"
+                             referencedTableName="person" referencedColumnNames="id" onDelete="CASCADE"/>
+
+    <addUniqueConstraint tableName="fork_presence_pattern" columnNames="person_id, valid_from"
+                         constraintName="uc_fork_presence_pattern_person_valid_from"/>
+  </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,93 @@
+<!doctype html>
+<html
+  lang="en"
+  th:lang="${language}"
+  th:class="|theme-${theme}|"
+  th:data-nav-collapsed="${navigationCollapsed ? 'true' : null}"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:asset="http://www.w3.org/1999/xhtml"
+>
+  <head th:replace="~{_layout::head(title=~{::title}, scriptsDefer=~{::scriptsDefer}, preload=~{::preload})}">
+    <title th:replace="~{fragments/page-title::page-title(#{fork.presence.overview.title})}"></title>
+    <th:block th:fragment="preload">
+      <link rel="preload" th:replace="~{fragments/asset-dependency-preload::links('fork_presence.js')}" />
+    </th:block>
+    <th:block th:fragment="scriptsDefer">
+      <script defer type="module" asset:src="fork_presence.js"></script>
+    </th:block>
+  </head>
+  <body th:replace="~{_layout::body(content=~{::main})}">
+    <main th:fragment="main" class="content-container">
+      <div th:replace="~{fragments/section-heading::section-heading(~{::presence-heading-body}, ~{::presence-heading-actions})}">
+        <th:block th:ref="presence-heading-body">
+          <h1 th:text="#{fork.presence.overview.title}">Anwesenheit</h1>
+          <div th:replace="~{fork/presence/fragments::month-navigation(hrefPrefix=|/web/presence?${selectedDepartmentId != null ? 'department=' + selectedDepartmentId + '&' : ''}|)}"></div>
+        </th:block>
+        <th:block th:ref="presence-heading-actions">
+          <a class="icon-link flex items-center gap-1" th:href="@{/web/presence/today}">
+            <svg th:replace="~{icon/building-2::svg(className='h-5 w-5')}" />
+            <span th:text="#{fork.presence.today.link}">Meine Anwesenheit</span>
+          </a>
+        </th:block>
+      </div>
+
+      <form th:if="${not #lists.isEmpty(visibleDepartments)}" th:action="@{/web/presence}" method="get" class="mb-6 print:hidden">
+        <input type="hidden" name="year" th:value="${year}" />
+        <input type="hidden" name="month" th:value="${month}" />
+        <label for="department" class="text-sm mr-2" th:text="#{fork.presence.department}">Abteilung</label>
+        <select id="department" name="department" class="w-auto" data-auto-submit>
+          <option value="" th:text="#{fork.presence.department.all}">Alle</option>
+          <option
+            th:each="department : ${visibleDepartments}"
+            th:value="${department.id}"
+            th:text="${department.name}"
+            th:selected="${department.id == selectedDepartmentId}"
+          ></option>
+        </select>
+        <noscript><button type="submit" class="button" th:text="#{fork.presence.department.show}">Anzeigen</button></noscript>
+      </form>
+
+      <div class="overflow-x-auto">
+        <table class="text-sm border-separate border-spacing-0" data-test-id="presence-overview">
+          <thead>
+            <tr>
+              <th scope="col" class="sticky left-0 z-10 bg-white dark:bg-zinc-900 text-left p-2 min-w-48" th:text="#{fork.presence.person}">Person</th>
+              <th
+                th:each="day : ${days}"
+                scope="col"
+                class="p-1 text-center font-normal"
+                th:classappend="|${day.weekend ? 'text-zinc-400 dark:text-zinc-500' : ''} ${day.today ? 'bg-emerald-50 dark:bg-emerald-950' : ''}|"
+              >
+                <span class="block font-bold" th:text="${day.dayOfMonth}">1</span>
+                <span class="block text-xs" th:text="${day.dayOfWeek}">Mo</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="row : ${rows}" class="border-t border-zinc-100 dark:border-zinc-800">
+              <th scope="row" class="sticky left-0 z-10 bg-white dark:bg-zinc-900 text-left p-2 font-normal whitespace-nowrap">
+                <a th:if="${row.editable}" class="hover:underline" th:href="@{/web/presence/persons/{id} (id=${row.person.id}, year=${year}, month=${month})}" th:text="${row.person.niceName}">Marlene Muster</a>
+                <span th:unless="${row.editable}" th:text="${row.person.niceName}">Marlene Muster</span>
+              </th>
+              <td
+                th:each="day, stat : ${row.days}"
+                class="p-0.5 text-center"
+                th:classappend="${days[stat.index].today ? 'bg-emerald-50 dark:bg-emerald-950' : ''}"
+              >
+                <th:block th:replace="~{fork/presence/fragments::day(day=${day})}"></th:block>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row" class="sticky left-0 z-10 bg-white dark:bg-zinc-900 text-left p-2 font-medium" th:text="#{fork.presence.inOffice}">Im Büro</th>
+              <td th:each="count, stat : ${inOffice}" class="p-1 text-center font-medium" th:classappend="${days[stat.index].weekend ? 'text-zinc-400' : ''}" th:text="${count > 0 ? count : ''}" data-test-id="presence-in-office"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <th:block th:replace="~{fork/presence/fragments::legend}"></th:block>
+    </main>
+  </body>
+</html>

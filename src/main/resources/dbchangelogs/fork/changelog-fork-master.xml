@@ -9,5 +9,6 @@
 
   <include relativeToChangelogFile="true" file="fork-0001-migrate-malta-to-liechtenstein.xml"/>
   <include relativeToChangelogFile="true" file="fork-0002-part-time.xml"/>
+  <include relativeToChangelogFile="true" file="fork-0003-presence.xml"/>
 
 </databaseChangeLog>

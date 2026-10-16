@@ -1,0 +1,102 @@
+<!doctype html>
+<html
+  lang="en"
+  th:lang="${language}"
+  th:class="|theme-${theme}|"
+  th:data-nav-collapsed="${navigationCollapsed ? 'true' : null}"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:asset="http://www.w3.org/1999/xhtml"
+>
+  <head th:replace="~{_layout::head(title=~{::title}, scriptsDefer=~{::scriptsDefer}, preload=~{::preload})}">
+    <title th:replace="~{fragments/page-title::page-title(#{fork.presence.planning.title(${person.niceName})})}"></title>
+    <th:block th:fragment="preload">
+      <link rel="preload" th:replace="~{fragments/asset-dependency-preload::links('fork_presence.js')}" />
+    </th:block>
+    <th:block th:fragment="scriptsDefer">
+      <script defer type="module" asset:src="fork_presence.js"></script>
+    </th:block>
+  </head>
+  <body th:replace="~{_layout::body(content=~{::main})}">
+    <main th:fragment="main" class="content-container content--max-w">
+      <div th:if="${presenceSaved}" class="mb-4">
+        <div th:replace="~{fragments/feedback-box::feedback-box-success(body=#{fork.presence.saved})}"></div>
+      </div>
+      <div th:if="${patternSaved}" class="mb-4">
+        <div th:replace="~{fragments/feedback-box::feedback-box-success(body=#{fork.presence.pattern.saved})}"></div>
+      </div>
+
+      <div th:replace="~{fragments/section-heading::section-heading(~{::planning-heading-body}, ~{::planning-heading-actions})}">
+        <th:block th:ref="planning-heading-body">
+          <h1 th:text="#{fork.presence.planning.title(${person.niceName})}">Anwesenheit von Marlene Muster</h1>
+          <div th:replace="~{fork/presence/fragments::month-navigation(hrefPrefix=|/web/presence/persons/${person.id}?|)}"></div>
+        </th:block>
+        <th:block th:ref="planning-heading-actions">
+          <a class="icon-link" th:href="@{/web/presence (year=${year}, month=${month})}" th:text="#{fork.presence.overview.link}">Teamübersicht</a>
+        </th:block>
+      </div>
+
+      <form method="post" th:action="@{/web/presence/persons/{id} (id=${person.id})}" class="mb-12" data-test-id="presence-planning-form">
+        <input type="hidden" name="year" th:value="${year}" />
+        <input type="hidden" name="month" th:value="${month}" />
+        <ul class="divide-y divide-zinc-100 dark:divide-zinc-800">
+          <li
+            th:each="planningDay : ${days}"
+            class="flex flex-wrap items-center gap-4 py-2"
+            th:classappend="${planningDay.today ? 'bg-emerald-50 dark:bg-emerald-950' : ''}"
+          >
+            <span class="w-24 tabular-nums" th:classappend="${planningDay.day.workday ? '' : 'text-zinc-400 dark:text-zinc-500'}">
+              <span th:text="${planningDay.dayOfWeek}">Mo</span>
+              <span th:text="${#temporals.format(planningDay.date, 'dd.MM.')}">01.10.</span>
+            </span>
+            <th:block th:if="${planningDay.day.workday}">
+              <select
+                th:name="|day.${planningDay.date}|"
+                class="w-48"
+                th:attr="aria-label=${#temporals.format(planningDay.date, 'dd.MM.yyyy')}"
+              >
+                <option value="" th:text="#{fork.presence.planning.default}" th:selected="${!planningDay.day.explicit}">Standard (Wochenmuster)</option>
+                <option
+                  th:each="presenceType : ${presenceTypes}"
+                  th:value="${presenceType.name}"
+                  th:text="#{${'fork.presence.type.' + presenceType.name}}"
+                  th:selected="${planningDay.day.explicit && planningDay.day.type == presenceType}"
+                ></option>
+              </select>
+              <th:block th:replace="~{fork/presence/fragments::day(day=${planningDay.day})}"></th:block>
+            </th:block>
+            <th:block th:unless="${planningDay.day.workday}">
+              <th:block th:replace="~{fork/presence/fragments::day(day=${planningDay.day})}"></th:block>
+            </th:block>
+          </li>
+        </ul>
+        <button type="submit" class="button-main-green mt-6" th:text="#{action.save}">Speichern</button>
+      </form>
+
+      <section>
+        <h2 class="text-xl font-medium mb-2" th:text="#{fork.presence.pattern.title}">Wochenmuster</h2>
+        <p class="text-sm text-black/75 dark:text-zinc-300 mb-4" th:text="#{fork.presence.pattern.description}"></p>
+        <form method="post" th:action="@{/web/presence/persons/{id}/pattern (id=${person.id})}" class="flex flex-wrap items-end gap-4" data-test-id="presence-pattern-form">
+          <div th:each="weekDay : ${weekDays}" class="flex flex-col">
+            <label th:for="|pattern-${weekDay}|" class="text-sm" th:text="#{${weekDay.name}}">Montag</label>
+            <select th:id="|pattern-${weekDay}|" th:name="${weekDay.name}" class="w-40">
+              <option value="" th:text="#{fork.presence.pattern.none}">–</option>
+              <option
+                th:each="presenceType : ${presenceTypes}"
+                th:value="${presenceType.name}"
+                th:text="#{${'fork.presence.type.' + presenceType.name}}"
+                th:selected="${pattern[weekDay] == presenceType}"
+              ></option>
+            </select>
+          </div>
+          <div class="flex flex-col">
+            <label for="validFrom" class="text-sm" th:text="#{fork.presence.pattern.validFrom}">Gültig ab</label>
+            <input id="validFrom" name="validFrom" type="date" th:value="${patternValidFrom}" required />
+          </div>
+          <button type="submit" class="button" th:text="#{fork.presence.pattern.save}">Wochenmuster speichern</button>
+        </form>
+      </section>
+
+      <th:block th:replace="~{fork/presence/fragments::legend}"></th:block>
+    </main>
+  </body>
+</html>

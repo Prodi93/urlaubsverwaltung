@@ -32,7 +32,7 @@ class WebManifestControllerTest {
             .andExpect(jsonPath("$.icons.length()", is(2)))
             .andExpect(jsonPath("$.icons[0].src", is("favicons/android-chrome-192x192.png")))
             .andExpect(jsonPath("$.scope", is(".")))
-            .andExpect(jsonPath("$.shortcuts.length()", is(2)))
+            .andExpect(jsonPath("$.shortcuts.length()", is(3)))
             .andExpect(jsonPath("$.shortcuts[0].name", is("Abwesenheit beantragen")))
             .andExpect(jsonPath("$.shortcuts[0].url", is("web/application/new")));
     }
@@ -55,6 +55,7 @@ class WebManifestControllerTest {
         messageSource.setUseCodeAsDefaultMessage(true);
         messageSource.addMessage("fork.pwa.shortcut.application.new", GERMAN, "Abwesenheit beantragen");
         messageSource.addMessage("fork.pwa.shortcut.overview", GERMAN, "Übersicht");
+        messageSource.addMessage("fork.pwa.shortcut.presence.today", GERMAN, "Anwesenheit heute");
         return messageSource;
     }
 }

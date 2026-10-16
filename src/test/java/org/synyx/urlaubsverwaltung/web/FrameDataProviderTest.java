@@ -105,6 +105,7 @@ class FrameDataProviderTest {
                     basicOverviewLink(10L),
                     basicApplicationLink(),
                     basicAbsenceOverviewLink(),
+                    basicPresenceLink(),
                     basicAbsenceLink(),
                     basicSickNoteLink(),
                     basicOvertimeLink()
@@ -324,6 +325,7 @@ class FrameDataProviderTest {
                     basicOverviewLink(10L),
                     basicApplicationLink(),
                     basicAbsenceOverviewLink(),
+                    basicPresenceLink(),
                     basicAbsenceLink(),
                     basicSickNoteLink(),
                     basicOvertimeLink()
@@ -373,6 +375,7 @@ class FrameDataProviderTest {
                     basicOverviewLink(10L),
                     basicApplicationLink(),
                     basicAbsenceOverviewLink(),
+                    basicPresenceLink(),
                     basicAbsenceLink(),
                     basicSickNoteLink(),
                     basicOvertimeLink()
@@ -421,6 +424,7 @@ class FrameDataProviderTest {
                     basicOverviewLink(10L),
                     basicApplicationLink(),
                     basicAbsenceOverviewLink(),
+                    basicPresenceLink(),
                     basicAbsenceLink(),
                     basicSickNoteLink(),
                     basicOvertimeLink()
@@ -468,6 +472,7 @@ class FrameDataProviderTest {
                     basicOverviewLink(10L),
                     basicApplicationLink(),
                     basicAbsenceOverviewLink(),
+                    basicPresenceLink(),
                     basicAbsenceLink(),
                     basicSickNoteLink(),
                     basicOvertimeLink()
@@ -516,6 +521,7 @@ class FrameDataProviderTest {
                     basicOverviewLink(10L),
                     basicApplicationLink(),
                     basicAbsenceOverviewLink(),
+                    basicPresenceLink(),
                     basicAbsenceLink(),
                     basicSickNoteLink(),
                     basicOvertimeLink()
@@ -777,6 +783,10 @@ class FrameDataProviderTest {
 
     private static NavigationItemDto basicAbsenceOverviewLink() {
         return basicAbsenceOverviewLink(false);
+    }
+
+    private static NavigationItemDto basicPresenceLink() {
+        return new NavigationItemDto("basic-presence-link", "/web/presence", "nav.basic.presence", "building-2", false);
     }
 
     private static NavigationItemDto basicAbsenceOverviewLink(boolean active) {

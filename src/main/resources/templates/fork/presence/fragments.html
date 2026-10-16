@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title></title>
+  </head>
+  <body>
+    <!-- one day of a person: presence, absence, public holiday or no workday -->
+    <th:block th:fragment="day(day)">
+      <th:block th:switch="${day.kind.name}">
+        <span
+          th:case="'PRESENCE'"
+          th:with="typeKey=|fork.presence.type.${day.type.name}|"
+          class="inline-flex items-center justify-center w-7 h-7 rounded-md text-xs font-semibold"
+          th:classappend="|${day.type.name == 'OFFICE' ? 'bg-emerald-500 text-white' : (day.type.name == 'HOME_OFFICE' ? 'bg-sky-500 text-white' : 'bg-violet-500 text-white')} ${day.explicit ? '' : 'opacity-50'} ${day.halfDayOff ? 'ring-2 ring-amber-400' : ''}|"
+          th:title="${#messages.msg(typeKey) + (day.explicit ? '' : ' (' + #messages.msg('fork.presence.pattern.short') + ')') + (day.halfDayOff ? ' – ' + #messages.msg('fork.presence.halfDayOff') : '')}"
+          th:text="#{${typeKey + '.short'}}"
+          data-test-id="presence-day"
+        >B</span>
+        <span
+          th:case="'UNPLANNED'"
+          class="inline-block w-7 h-7 rounded-md border border-dashed border-zinc-300 dark:border-zinc-600"
+          th:classappend="${day.halfDayOff ? 'ring-2 ring-amber-400' : ''}"
+          th:title="#{fork.presence.unplanned}"
+        ></span>
+        <span
+          th:case="'ABSENT'"
+          class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-amber-200 text-amber-900 dark:bg-amber-700 dark:text-amber-50 text-xs"
+          th:title="#{fork.presence.absent}"
+          th:text="#{fork.presence.absent.short}"
+        >A</span>
+        <span
+          th:case="'PUBLIC_HOLIDAY'"
+          class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200 text-xs"
+          th:title="#{fork.presence.publicHoliday}"
+          th:text="#{fork.presence.publicHoliday.short}"
+        >F</span>
+        <span th:case="*" class="inline-flex items-center justify-center w-7 h-7 text-zinc-300 dark:text-zinc-600" th:title="#{fork.presence.noWorkday}">
+          <svg th:replace="~{icon/slash::svg(className='w-4 h-4')}" />
+        </span>
+      </th:block>
+    </th:block>
+
+    <th:block th:fragment="legend">
+      <ul class="flex flex-wrap gap-x-6 gap-y-2 text-sm mt-6" data-test-id="presence-legend">
+        <li class="flex items-center gap-2">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-emerald-500 text-white text-xs font-semibold" th:text="#{fork.presence.type.OFFICE.short}">B</span>
+          <span th:text="#{fork.presence.type.OFFICE}">Büro</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-sky-500 text-white text-xs font-semibold" th:text="#{fork.presence.type.HOME_OFFICE.short}">H</span>
+          <span th:text="#{fork.presence.type.HOME_OFFICE}">Homeoffice</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-violet-500 text-white text-xs font-semibold" th:text="#{fork.presence.type.MOBILE_WORK.short}">M</span>
+          <span th:text="#{fork.presence.type.MOBILE_WORK}">Mobil / unterwegs</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="inline-block w-6 h-6 rounded-md bg-emerald-500 opacity-50"></span>
+          <span th:text="#{fork.presence.pattern.legend}">aus Wochenmuster</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="inline-block w-6 h-6 rounded-md ring-2 ring-amber-400"></span>
+          <span th:text="#{fork.presence.halfDayOff}">halber Tag abwesend / frei</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-amber-200 text-amber-900 text-xs" th:text="#{fork.presence.absent.short}">A</span>
+          <span th:text="#{fork.presence.absent}">abwesend</span>
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-md bg-zinc-200 text-zinc-700 text-xs" th:text="#{fork.presence.publicHoliday.short}">F</span>
+          <span th:text="#{fork.presence.publicHoliday}">Feiertag</span>
+        </li>
+      </ul>
+    </th:block>
+
+    <!-- month navigation, hrefPrefix must end with '?' or '&' -->
+    <th:block th:fragment="month-navigation(hrefPrefix)">
+      <div class="flex items-center gap-2">
+        <a
+          class="icon-link p-1"
+          th:href="@{|${hrefPrefix}year=${previousMonth.year}&month=${previousMonth.monthValue}|}"
+          th:title="#{fork.presence.month.previous}"
+        >
+          <svg th:replace="~{icon/chevron-left::svg(className='w-5 h-5')}" />
+          <span class="sr-only" th:text="#{fork.presence.month.previous}"></span>
+        </a>
+        <span class="font-medium min-w-36 text-center" th:text="${monthName}">Oktober 2026</span>
+        <a
+          class="icon-link p-1"
+          th:href="@{|${hrefPrefix}year=${nextMonth.year}&month=${nextMonth.monthValue}|}"
+          th:title="#{fork.presence.month.next}"
+        >
+          <svg th:replace="~{icon/chevron-right::svg(className='w-5 h-5')}" />
+          <span class="sr-only" th:text="#{fork.presence.month.next}"></span>
+        </a>
+      </div>
+    </th:block>
+  </body>
+</html>
