@@ -50,8 +50,9 @@ In Entra ID → *App-Registrierungen* → die App-Registrierung der Urlaubsverwa
 3. *Clientanwendung hinzufügen* mit dem Bereich `access_as_user`:
    - `1fec8e78-bce4-4aaf-ab1b-5451cc387264` (Teams Desktop und Mobile)
    - `5e3ce6c0-2b1f-4285-8d4b-75ee78787346` (Teams Web)
-4. *API-Berechtigungen* → *Berechtigung hinzufügen* → *Meine APIs* → die Urlaubsverwaltung → `access_as_user` →
-   *Administratorzustimmung erteilen*.
+4. Optional: *API-Berechtigungen* → *Berechtigung hinzufügen* → Tab *Von meiner Organisation verwendete APIs* → nach der
+   App-Registrierung suchen → `access_as_user` → *Administratorzustimmung erteilen*. Nicht nötig, weil die Teams-Clients
+   aus Schritt 3 ohne Zustimmung zugreifen dürfen. (*Meine APIs* zeigt nur App-Registrierungen, deren Besitzer man ist.)
 5. Das App-Paket neu herunterladen (es enthält jetzt `webApplicationInfo`) und im Teams Admin Center bei der bestehenden
    App per *Datei hochladen* aktualisieren. Teams übernimmt die neue App-Version nach einigen Minuten, ggf. Teams neu starten.
 
