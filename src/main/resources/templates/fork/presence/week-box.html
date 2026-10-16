@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title></title>
+  </head>
+  <body>
+    <!-- presence of the current week on the person overview, and the form used by the calendar menu -->
+    <th:block th:fragment="week-box(personId, days, presenceTypes)">
+      <form
+        id="fork-presence-range-form"
+        method="post"
+        th:action="@{/web/presence/persons/{id}/range (id=${personId})}"
+        class="hidden"
+        th:data-label-absence="#{fork.presence.menu.absence}"
+        th:data-label-office="#{fork.presence.type.OFFICE}"
+        th:data-label-home-office="#{fork.presence.type.HOME_OFFICE}"
+        th:data-label-mobile="#{fork.presence.type.MOBILE_WORK}"
+        th:data-label-remove="#{fork.presence.menu.remove}"
+      >
+        <input type="hidden" name="from" />
+        <input type="hidden" name="to" />
+        <input type="hidden" name="type" />
+        <input type="hidden" name="returnTo" value="overview" />
+      </form>
+
+      <section class="mb-8" data-test-id="presence-week-box">
+        <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+          <h2 class="text-lg font-medium" th:text="#{fork.presence.week.title}">Anwesenheit diese Woche</h2>
+          <a
+            class="icon-link text-sm"
+            th:href="@{/web/presence/persons/{id} (id=${personId})}"
+            th:text="#{fork.presence.planning.link}"
+            >Ganzen Monat planen</a
+          >
+        </div>
+        <ul class="grid grid-cols-1 gap-2 @2xl/main:grid-cols-5">
+          <li
+            th:each="planningDay : ${days}"
+            class="rounded-lg border border-zinc-200 dark:border-zinc-700 p-2"
+            th:classappend="${planningDay.today ? 'ring-2 ring-emerald-500' : ''}"
+          >
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="text-sm">
+                <span class="font-medium" th:text="${planningDay.dayOfWeek}">Mo</span>
+                <span
+                  class="text-black/75 dark:text-zinc-300"
+                  th:text="${#temporals.format(planningDay.date, 'dd.MM.')}"
+                  >12.10.</span
+                >
+              </span>
+              <th:block th:replace="~{fork/presence/fragments::day(day=${planningDay.day})}"></th:block>
+            </div>
+            <form
+              th:if="${planningDay.day.workday}"
+              method="post"
+              th:action="@{/web/presence/persons/{id}/range (id=${personId})}"
+              class="grid grid-cols-3 gap-1"
+            >
+              <input type="hidden" name="from" th:value="${planningDay.date}" />
+              <input type="hidden" name="returnTo" value="overview" />
+              <button
+                th:each="presenceType : ${presenceTypes}"
+                type="submit"
+                name="type"
+                th:value="${presenceType.name}"
+                class="rounded px-1 py-1 text-xs font-medium text-white"
+                th:classappend="${presenceType.name == 'OFFICE' ? 'bg-sky-500' : (presenceType.name == 'HOME_OFFICE' ? 'bg-emerald-500' : 'bg-violet-500')}"
+                th:title="#{${'fork.presence.type.' + presenceType.name}}"
+                th:text="#{${'fork.presence.type.' + presenceType.name + '.button'}}"
+              >
+                Büro
+              </button>
+            </form>
+            <p
+              th:unless="${planningDay.day.workday}"
+              class="text-xs text-black/75 dark:text-zinc-300"
+              th:text="${@forkPresenceLabels.title(planningDay.day)}"
+            ></p>
+          </li>
+        </ul>
+      </section>
+    </th:block>
+  </body>
+</html>

@@ -23,6 +23,7 @@ import org.synyx.urlaubsverwaltung.person.PersonService;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
@@ -62,7 +63,7 @@ class PresenceApiController {
             throw new ResponseStatusException(BAD_REQUEST, "invalid period, 'from' must be before 'to' and at most %s days".formatted(MAX_DAYS));
         }
         return presenceService.getPresences(person(personId), new DateRange(from, to)).entrySet().stream()
-            .map(entry -> new PresenceDto(entry.getKey(), entry.getValue().type(), entry.getValue().explicit()))
+            .map(entry -> PresenceDto.of(entry.getKey(), entry.getValue()))
             .sorted(Comparator.comparing(PresenceDto::date))
             .toList();
     }
@@ -73,10 +74,10 @@ class PresenceApiController {
     public ResponseEntity<Void> setPresence(@Parameter(description = "ID of the person") @PathVariable("personId") Long personId,
                                             @PathVariable("date") @DateTimeFormat(iso = DATE) LocalDate date,
                                             @RequestBody PresenceRequestDto request) {
-        if (request == null || request.type() == null) {
-            throw new ResponseStatusException(BAD_REQUEST, "type is required");
-        }
-        presenceService.setPresence(person(personId), date, request.type());
+        final PresenceSlots slots = Optional.ofNullable(request)
+            .flatMap(PresenceRequestDto::slots)
+            .orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, "type or morning / noon is required"));
+        presenceService.setPresence(person(personId), date, slots);
         return ResponseEntity.noContent().build();
     }
 
@@ -85,7 +86,7 @@ class PresenceApiController {
     @PreAuthorize(IS_ALLOWED_FOR_PERSON)
     public ResponseEntity<Void> deletePresence(@Parameter(description = "ID of the person") @PathVariable("personId") Long personId,
                                                @PathVariable("date") @DateTimeFormat(iso = DATE) LocalDate date) {
-        presenceService.setPresence(person(personId), date, null);
+        presenceService.setPresence(person(personId), date, (PresenceSlots) null);
         return ResponseEntity.noContent().build();
     }
 
@@ -93,9 +94,26 @@ class PresenceApiController {
         return personService.getPersonByID(personId).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "person not found"));
     }
 
-    public record PresenceDto(LocalDate date, PresenceType type, boolean explicit) {
+    /**
+     * @param type    the presence of the whole day, {@code null} if morning and noon differ
+     * @param morning the presence in the morning
+     * @param noon    the presence in the noon
+     */
+    public record PresenceDto(LocalDate date, PresenceType type, PresenceType morning, PresenceType noon, boolean explicit) {
+
+        static PresenceDto of(LocalDate date, Presence presence) {
+            final PresenceSlots slots = presence.slots();
+            return new PresenceDto(date, slots.isFullDay() ? slots.morning() : null, slots.morning(), slots.noon(), presence.explicit());
+        }
     }
 
-    public record PresenceRequestDto(PresenceType type) {
+    /**
+     * Either {@code type} for the whole day, or {@code morning} and / or {@code noon}.
+     */
+    public record PresenceRequestDto(PresenceType type, PresenceType morning, PresenceType noon) {
+
+        Optional<PresenceSlots> slots() {
+            return type != null ? Optional.of(PresenceSlots.fullDay(type)) : PresenceSlots.of(morning, noon);
+        }
     }
 }

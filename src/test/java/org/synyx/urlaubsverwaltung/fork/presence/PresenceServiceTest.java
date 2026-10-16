@@ -47,30 +47,30 @@ class PresenceServiceTest {
         final DateRange week = new DateRange(LocalDate.of(2026, 10, 12), LocalDate.of(2026, 10, 18));
 
         final PresencePatternEntity oldPattern = new PresencePatternEntity(person, LocalDate.of(2026, 1, 1));
-        oldPattern.setDays(Map.of(DayOfWeek.MONDAY, OFFICE, DayOfWeek.TUESDAY, OFFICE, DayOfWeek.WEDNESDAY, OFFICE));
+        oldPattern.setDays(Map.of(DayOfWeek.MONDAY, full(OFFICE), DayOfWeek.TUESDAY, full(OFFICE), DayOfWeek.WEDNESDAY, full(OFFICE)));
         final PresencePatternEntity newPattern = new PresencePatternEntity(person, LocalDate.of(2026, 10, 14));
-        newPattern.setDays(Map.of(DayOfWeek.WEDNESDAY, HOME_OFFICE, DayOfWeek.THURSDAY, HOME_OFFICE));
+        newPattern.setDays(Map.of(DayOfWeek.WEDNESDAY, full(HOME_OFFICE), DayOfWeek.THURSDAY, new PresenceSlots(OFFICE, HOME_OFFICE)));
 
         when(presencePatternRepository.findByPersonInOrderByValidFromAsc(List.of(person))).thenReturn(List.of(oldPattern, newPattern));
         when(presenceDayRepository.findByPersonInAndDateBetween(List.of(person), week.startDate(), week.endDate()))
-            .thenReturn(List.of(new PresenceDayEntity(person, LocalDate.of(2026, 10, 13), MOBILE_WORK)));
+            .thenReturn(List.of(new PresenceDayEntity(person, LocalDate.of(2026, 10, 13), full(MOBILE_WORK))));
 
         final Map<LocalDate, Presence> presences = sut.getPresences(person, week);
 
         assertThat(presences)
-            .containsEntry(LocalDate.of(2026, 10, 12), new Presence(OFFICE, false))
-            .containsEntry(LocalDate.of(2026, 10, 13), new Presence(MOBILE_WORK, true))
-            .containsEntry(LocalDate.of(2026, 10, 14), new Presence(HOME_OFFICE, false))
-            .containsEntry(LocalDate.of(2026, 10, 15), new Presence(HOME_OFFICE, false))
+            .containsEntry(LocalDate.of(2026, 10, 12), new Presence(full(OFFICE), false))
+            .containsEntry(LocalDate.of(2026, 10, 13), new Presence(full(MOBILE_WORK), true))
+            .containsEntry(LocalDate.of(2026, 10, 14), new Presence(full(HOME_OFFICE), false))
+            .containsEntry(LocalDate.of(2026, 10, 15), new Presence(new PresenceSlots(OFFICE, HOME_OFFICE), false))
             .doesNotContainKeys(LocalDate.of(2026, 10, 16), LocalDate.of(2026, 10, 17));
     }
 
     @Test
     void ensureSettingNullRemovesPlannedDay() {
-        final PresenceDayEntity existing = new PresenceDayEntity(person, LocalDate.of(2026, 10, 13), OFFICE);
+        final PresenceDayEntity existing = new PresenceDayEntity(person, LocalDate.of(2026, 10, 13), full(OFFICE));
         when(presenceDayRepository.findByPersonAndDate(person, LocalDate.of(2026, 10, 13))).thenReturn(Optional.of(existing));
 
-        sut.setPresence(person, LocalDate.of(2026, 10, 13), null);
+        sut.setPresence(person, LocalDate.of(2026, 10, 13), (PresenceSlots) null);
 
         verify(presenceDayRepository).delete(existing);
         verify(presenceDayRepository, never()).save(any());
@@ -78,17 +78,21 @@ class PresenceServiceTest {
 
     @Test
     void ensureSettingTypeUpdatesPlannedDay() {
-        final PresenceDayEntity existing = new PresenceDayEntity(person, LocalDate.of(2026, 10, 13), OFFICE);
+        final PresenceDayEntity existing = new PresenceDayEntity(person, LocalDate.of(2026, 10, 13), full(OFFICE));
         when(presenceDayRepository.findByPersonAndDate(person, LocalDate.of(2026, 10, 13))).thenReturn(Optional.of(existing));
 
-        sut.setPresence(person, LocalDate.of(2026, 10, 13), HOME_OFFICE);
+        sut.setPresence(person, LocalDate.of(2026, 10, 13), new PresenceSlots(HOME_OFFICE, null));
 
-        assertThat(existing.getType()).isEqualTo(HOME_OFFICE);
+        assertThat(existing.getType()).isEqualTo(new PresenceSlots(HOME_OFFICE, null));
         verify(presenceDayRepository).save(existing);
     }
 
     @Test
     void ensureNoPresencesForNoPersons() {
         assertThat(sut.getPresences(List.of(), new DateRange(LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 1)))).isEmpty();
+    }
+
+    private static PresenceSlots full(PresenceType type) {
+        return PresenceSlots.fullDay(type);
     }
 }

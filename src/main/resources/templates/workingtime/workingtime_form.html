@@ -198,7 +198,11 @@
             <!-- LI fork: part time without fixed day off -->
             <div class="uv-form__input-row">
               <p class="uv-form__label" th:text="|#{fork.parttime.link.label}:|">Teilzeit</p>
-              <a class="icon-link text-sm" th:href="@{/web/person/{personId}/parttime (personId=${person.id})}" th:text="#{fork.parttime.link}">
+              <a
+                class="icon-link text-sm"
+                th:href="@{/web/person/{personId}/parttime (personId=${person.id})}"
+                th:text="#{fork.parttime.link}"
+              >
                 Teilzeit ohne festen freien Tag verwalten
               </a>
             </div>

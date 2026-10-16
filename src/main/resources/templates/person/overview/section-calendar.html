@@ -27,6 +27,12 @@
           </th:block>
         </div>
 
+        <!-- LI fork: presence of the current week and planning in the calendar -->
+        <th:block
+          th:if="${forkPresenceWeek != null}"
+          th:insert="~{fork/presence/week-box::week-box(personId=${person.id}, days=${forkPresenceWeek}, presenceTypes=${forkPresenceTypes})}"
+        ></th:block>
+
         <div id="datepicker" class="flex justify-center items-center">
           <div class="lds-ellipsis">
             <div></div>

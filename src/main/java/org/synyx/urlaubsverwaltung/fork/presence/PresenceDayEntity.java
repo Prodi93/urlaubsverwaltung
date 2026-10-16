@@ -1,8 +1,8 @@
 package org.synyx.urlaubsverwaltung.fork.presence;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
@@ -13,11 +13,10 @@ import org.synyx.urlaubsverwaltung.tenancy.tenant.AbstractTenantAwareEntity;
 
 import java.time.LocalDate;
 
-import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.SEQUENCE;
 
 /**
- * Explicitly planned presence of a person on a day, overrides the weekly pattern.
+ * Explicitly planned presence of a person on a day (or half a day), overrides the weekly pattern.
  */
 @Entity
 @Table(name = "fork_presence_day")
@@ -35,15 +34,15 @@ public class PresenceDayEntity extends AbstractTenantAwareEntity {
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
-    @Enumerated(STRING)
+    @Convert(converter = PresenceSlotsConverter.class)
     @Column(name = "type", nullable = false)
-    private PresenceType type;
+    private PresenceSlots type;
 
     protected PresenceDayEntity() {
         // OK
     }
 
-    PresenceDayEntity(Person person, LocalDate date, PresenceType type) {
+    PresenceDayEntity(Person person, LocalDate date, PresenceSlots type) {
         this.person = person;
         this.date = date;
         this.type = type;
@@ -61,11 +60,11 @@ public class PresenceDayEntity extends AbstractTenantAwareEntity {
         return date;
     }
 
-    public PresenceType getType() {
+    public PresenceSlots getType() {
         return type;
     }
 
-    void setType(PresenceType type) {
+    void setType(PresenceSlots type) {
         this.type = type;
     }
 }

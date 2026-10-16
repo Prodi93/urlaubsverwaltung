@@ -22,7 +22,9 @@
         <div th:replace="~{fragments/feedback-box::feedback-box-success(body=#{fork.presence.saved})}"></div>
       </div>
 
-      <div th:replace="~{fragments/section-heading::section-heading(~{::today-heading-body}, ~{::today-heading-actions})}">
+      <div
+        th:replace="~{fragments/section-heading::section-heading(~{::today-heading-body}, ~{::today-heading-actions})}"
+      >
         <th:block th:ref="today-heading-body">
           <h1 th:text="#{fork.presence.today.title}">Meine Anwesenheit</h1>
         </th:block>
@@ -37,11 +39,20 @@
             <span class="font-medium">
               <th:block th:if="${planningDay.today}" th:text="#{fork.presence.today}">Heute</th:block>
               <th:block th:unless="${planningDay.today}" th:text="${planningDay.dayOfWeek}">Di</th:block>
-              <span class="text-black/75 dark:text-zinc-300 font-normal" th:text="${#temporals.format(planningDay.date, 'dd.MM.yyyy')}">16.10.2026</span>
+              <span
+                class="text-black/75 dark:text-zinc-300 font-normal"
+                th:text="${#temporals.format(planningDay.date, 'dd.MM.yyyy')}"
+                >16.10.2026</span
+              >
             </span>
             <th:block th:replace="~{fork/presence/fragments::day(day=${planningDay.day})}"></th:block>
           </div>
-          <form th:if="${planningDay.day.workday}" method="post" th:action="@{/web/presence/today}" class="grid grid-cols-3 gap-2">
+          <form
+            th:if="${planningDay.day.workday}"
+            method="post"
+            th:action="@{/web/presence/today}"
+            class="grid grid-cols-3 gap-2"
+          >
             <input type="hidden" name="date" th:value="${planningDay.date}" />
             <button
               th:each="presenceType : ${presenceTypes}"
@@ -49,16 +60,27 @@
               name="type"
               th:value="${presenceType.name}"
               class="button py-3"
-              th:classappend="${planningDay.day.kind.name == 'PRESENCE' && planningDay.day.type == presenceType ? 'button-main-green' : ''}"
+              th:classappend="${planningDay.day.presence.isPresent() && planningDay.day.presence.get().fullDay && planningDay.day.presence.get().morning == presenceType ? 'button-main-green' : ''}"
               th:text="#{${'fork.presence.type.' + presenceType.name}}"
-            >Büro</button>
+            >
+              Büro
+            </button>
           </form>
-          <p th:unless="${planningDay.day.workday}" class="text-sm text-black/75 dark:text-zinc-300" th:text="#{fork.presence.today.noWorkday}"></p>
+          <p
+            th:unless="${planningDay.day.workday}"
+            class="text-sm text-black/75 dark:text-zinc-300"
+            th:text="#{fork.presence.today.noWorkday}"
+          ></p>
         </li>
       </ul>
 
       <p class="mt-6">
-        <a class="icon-link" th:href="@{/web/presence/persons/{id} (id=${person.id})}" th:text="#{fork.presence.planning.link}">Ganzen Monat planen</a>
+        <a
+          class="icon-link"
+          th:href="@{/web/presence/persons/{id} (id=${person.id})}"
+          th:text="#{fork.presence.planning.link}"
+          >Ganzen Monat planen</a
+        >
       </p>
     </main>
   </body>

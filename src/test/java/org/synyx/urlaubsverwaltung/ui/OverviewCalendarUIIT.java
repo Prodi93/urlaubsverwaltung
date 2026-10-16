@@ -136,6 +136,7 @@ class OverviewCalendarUIIT {
         final LocalDate date = LocalDate.of(2022, MARCH, 15);
         overviewPage.assertDayIsSelectable(date);
         overviewPage.clickDay(date);
+        overviewPage.chooseApplyForLeaveInPresenceMenu();
 
         // Ensure navigation to ApplicationPage
         applicationFormPage.waitForVisible();
@@ -168,6 +169,7 @@ class OverviewCalendarUIIT {
 
         overviewPage.selectDateRange(startDate, endDate);
         overviewPage.clickDay(endDate);
+        overviewPage.chooseApplyForLeaveInPresenceMenu();
 
         // Ensure navigation to ApplicationPage
         applicationFormPage.waitForVisible();

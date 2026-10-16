@@ -104,7 +104,6 @@ class FrameDataProviderTest {
                 assertThat(dto.basic()).containsExactly(
                     basicOverviewLink(10L),
                     basicApplicationLink(),
-                    basicAbsenceOverviewLink(),
                     basicPresenceLink(),
                     basicImportExportLink(),
                     basicAbsenceLink(),
@@ -325,7 +324,6 @@ class FrameDataProviderTest {
                 assertThat(dto.basic()).containsExactly(
                     basicOverviewLink(10L),
                     basicApplicationLink(),
-                    basicAbsenceOverviewLink(),
                     basicPresenceLink(),
                     basicImportExportLink(),
                     basicAbsenceLink(),
@@ -376,7 +374,6 @@ class FrameDataProviderTest {
                 assertThat(dto.basic()).containsExactly(
                     basicOverviewLink(10L),
                     basicApplicationLink(),
-                    basicAbsenceOverviewLink(),
                     basicPresenceLink(),
                     basicImportExportLink(),
                     basicAbsenceLink(),
@@ -426,7 +423,6 @@ class FrameDataProviderTest {
                 assertThat(dto.basic()).containsExactly(
                     basicOverviewLink(10L),
                     basicApplicationLink(),
-                    basicAbsenceOverviewLink(),
                     basicPresenceLink(),
                     basicImportExportLink(),
                     basicAbsenceLink(),
@@ -475,7 +471,6 @@ class FrameDataProviderTest {
                 assertThat(dto.basic()).containsExactly(
                     basicOverviewLink(10L),
                     basicApplicationLink(),
-                    basicAbsenceOverviewLink(),
                     basicPresenceLink(),
                     basicImportExportLink(),
                     basicAbsenceLink(),
@@ -525,7 +520,6 @@ class FrameDataProviderTest {
                 assertThat(dto.basic()).containsExactly(
                     basicOverviewLink(10L),
                     basicApplicationLink(),
-                    basicAbsenceOverviewLink(),
                     basicPresenceLink(),
                     basicImportExportLink(),
                     basicAbsenceLink(),
@@ -787,20 +781,12 @@ class FrameDataProviderTest {
         return new NavigationItemDto("basic-application-link", "/web/application", "nav.basic.absence-todos", "list-todo", active);
     }
 
-    private static NavigationItemDto basicAbsenceOverviewLink() {
-        return basicAbsenceOverviewLink(false);
-    }
-
     private static NavigationItemDto basicImportExportLink() {
         return new NavigationItemDto("basic-import-export-link", "/web/import-export", "nav.basic.import-export", "download", false);
     }
 
     private static NavigationItemDto basicPresenceLink() {
-        return new NavigationItemDto("basic-presence-link", "/web/presence", "nav.basic.presence", "building-2", false);
-    }
-
-    private static NavigationItemDto basicAbsenceOverviewLink(boolean active) {
-        return new NavigationItemDto("basic-absence-overview-link", "/web/absences", "nav.basic.absence-overview", "calendar-range", active);
+        return new NavigationItemDto("basic-presence-link", "/web/presence", "nav.basic.presence", "calendar-range", false);
     }
 
     private static NavigationItemDto basicAbsenceLink() {

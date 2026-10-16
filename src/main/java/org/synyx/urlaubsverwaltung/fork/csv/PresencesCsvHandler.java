@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import org.synyx.urlaubsverwaltung.absence.DateRange;
 import org.synyx.urlaubsverwaltung.fork.presence.Presence;
 import org.synyx.urlaubsverwaltung.fork.presence.PresenceService;
-import org.synyx.urlaubsverwaltung.fork.presence.PresenceType;
+import org.synyx.urlaubsverwaltung.fork.presence.PresenceSlots;
 import org.synyx.urlaubsverwaltung.person.Person;
 
 import java.time.LocalDate;
@@ -24,6 +24,7 @@ import static org.synyx.urlaubsverwaltung.fork.csv.CsvRowResult.Action.UPDATE;
 
 /**
  * Planned presences (not the ones of the weekly pattern). An empty type removes the planned presence.
+ * Half days are written as {@code <morning>|<noon>}, e.g. {@code OFFICE|HOME_OFFICE} or {@code |OFFICE}.
  */
 @Component
 class PresencesCsvHandler implements CsvDatasetHandler {
@@ -61,7 +62,7 @@ class PresencesCsvHandler implements CsvDatasetHandler {
         for (Person person : persons) {
             new TreeMap<>(presences.getOrDefault(person, Map.of())).forEach((date, presence) -> {
                 if (presence.explicit()) {
-                    rows.add(List.of(person.getUsername(), person.getEmail(), CsvValues.format(date), presence.type().name()));
+                    rows.add(List.of(person.getUsername(), person.getEmail(), CsvValues.format(date), presence.slots().asString()));
                 }
             });
         }
@@ -81,11 +82,11 @@ class PresencesCsvHandler implements CsvDatasetHandler {
                 return CsvRowResult.error(row, subject, "fork.csv.error.mandatory", DATE);
             }
             final LocalDate date = CsvValues.parseDate(row.get(DATE));
-            final PresenceType type = row.has(TYPE) ? CsvValues.parseEnum(PresenceType.class, row.get(TYPE)) : null;
+            final PresenceSlots type = row.has(TYPE) ? parse(row.get(TYPE)) : null;
 
-            final Optional<PresenceType> current = Optional.ofNullable(presenceService.getPresences(person, new DateRange(date, date)).get(date))
+            final Optional<PresenceSlots> current = Optional.ofNullable(presenceService.getPresences(person, new DateRange(date, date)).get(date))
                 .filter(Presence::explicit)
-                .map(Presence::type);
+                .map(Presence::slots);
 
             final CsvRowResult.Action action;
             if (type == null) {
@@ -93,7 +94,7 @@ class PresencesCsvHandler implements CsvDatasetHandler {
             } else if (current.isEmpty()) {
                 action = CREATE;
             } else {
-                action = current.get() == type ? UNCHANGED : UPDATE;
+                action = current.get().equals(type) ? UNCHANGED : UPDATE;
             }
 
             if (execute && action != UNCHANGED) {
@@ -102,6 +103,14 @@ class PresencesCsvHandler implements CsvDatasetHandler {
             return CsvRowResult.of(row, subject, action);
         } catch (IllegalArgumentException e) {
             return CsvRowResult.error(row, subject, e.getMessage());
+        }
+    }
+
+    private static PresenceSlots parse(String value) {
+        try {
+            return PresenceSlots.parse(value.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("fork.csv.error.value");
         }
     }
 }

@@ -66,7 +66,10 @@ describe("person/overview", function () {
     expect(globalThis.Urlaubsverwaltung.Calendar.init).toHaveBeenCalledTimes(1);
     const [parentElement, holidayService, date] = globalThis.Urlaubsverwaltung.Calendar.init.mock.calls[0];
     expect(parentElement).toBe(document.querySelector("#datepicker"));
-    expect(holidayService).toBe(holidayServiceInstance);
+    // LI fork: the holiday service is wrapped to show presences, calls are delegated to the created instance
+    expect(holidayService).not.toBe(holidayServiceInstance);
+    await holidayService.fetchPublicHolidays(2024);
+    expect(holidayServiceInstance.fetchPublicHolidays).toHaveBeenCalledWith(2024);
     expect(date).toEqual(new Date(2024, 5, 15));
   });
 

@@ -80,4 +80,12 @@ public class OverviewPage {
         final String dayName = "%s%02d".formatted(date.getMonth().getDisplayName(java.time.format.TextStyle.SHORT, locale), date.getDayOfMonth());
         return page.getByRole(AriaRole.LISTITEM).filter(new Locator.FilterOptions().setHasText(dayName)).locator("div");
     }
+
+    /**
+     * LI fork: selecting days in the calendar opens a menu to plan presences or to apply for leave.
+     * Clicks "apply for leave" in this menu, does not wait for anything.
+     */
+    public void chooseApplyForLeaveInPresenceMenu() {
+        page.locator(".fork-presence-menu [data-fork-presence-action=absence]").click();
+    }
 }

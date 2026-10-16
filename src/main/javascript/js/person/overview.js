@@ -1,5 +1,6 @@
 import { addMonths, getYear, setYear, startOfYear, subMonths } from "date-fns";
 import "../../components/calendar";
+import { withPresences } from "../fork/presence-calendar";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const { personId, webPrefix, apiPrefix, canApplyForLeave, i18n: i18nMessages } = globalThis.uv;
@@ -15,7 +16,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       date = startOfYear(setYear(date, Number(yearParameter)));
     }
 
-    const holidayService = Urlaubsverwaltung.HolidayService.create(webPrefix, apiPrefix, +personId);
+    const calendarParentElement = document.querySelector("#datepicker");
+
+    // LI fork: show and plan presences in the calendar
+    const holidayService = withPresences(Urlaubsverwaltung.HolidayService.create(webPrefix, apiPrefix, +personId), {
+      apiPrefix,
+      personId: +personId,
+      root: calendarParentElement,
+      form: document.querySelector("#fork-presence-range-form"),
+      canApplyForLeave: canApplyForLeave === true,
+    });
 
     const shownMonths = 10;
     const startDate = subMonths(date, shownMonths / 2);
@@ -31,7 +41,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await Promise.all(fetchPromises);
 
-    const calendarParentElement = document.querySelector("#datepicker");
     Urlaubsverwaltung.Calendar.init(calendarParentElement, holidayService, date, i18n, {
       canApplyForLeave: canApplyForLeave === true,
     });

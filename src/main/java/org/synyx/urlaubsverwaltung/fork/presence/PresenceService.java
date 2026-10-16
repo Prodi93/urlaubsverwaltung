@@ -74,7 +74,7 @@ public class PresenceService {
      * pattern applies again.
      */
     @Transactional
-    public void setPresence(Person person, LocalDate date, PresenceType type) {
+    public void setPresence(Person person, LocalDate date, PresenceSlots type) {
         final Optional<PresenceDayEntity> existing = presenceDayRepository.findByPersonAndDate(person, date);
         if (type == null) {
             existing.ifPresent(presenceDayRepository::delete);
@@ -85,8 +85,16 @@ public class PresenceService {
         presenceDayRepository.save(entity);
     }
 
+    /**
+     * Plans a full day presence, see {@link #setPresence(Person, LocalDate, PresenceSlots)}
+     */
     @Transactional
-    public void setPresences(Person person, Map<LocalDate, PresenceType> presences) {
+    public void setPresence(Person person, LocalDate date, PresenceType type) {
+        setPresence(person, date, type == null ? null : PresenceSlots.fullDay(type));
+    }
+
+    @Transactional
+    public void setPresences(Person person, Map<LocalDate, PresenceSlots> presences) {
         presences.forEach((date, type) -> setPresence(person, date, type));
     }
 
@@ -102,7 +110,7 @@ public class PresenceService {
     }
 
     @Transactional
-    public PresencePattern savePattern(Person person, LocalDate validFrom, Map<DayOfWeek, PresenceType> days) {
+    public PresencePattern savePattern(Person person, LocalDate validFrom, Map<DayOfWeek, PresenceSlots> days) {
         final PresencePatternEntity entity = presencePatternRepository.findByPersonAndValidFrom(person, validFrom)
             .orElseGet(() -> new PresencePatternEntity(person, validFrom));
         entity.setDays(days);

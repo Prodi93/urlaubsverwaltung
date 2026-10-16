@@ -134,9 +134,8 @@ public class FrameDataProvider implements DataProviderInterface {
 
         elements.add(new NavigationItemDto("basic-overview-link", overview, "nav.basic.overview", "house", url.equals(overview)));
         elements.add(new NavigationItemDto("basic-application-link", application, "nav.basic.absence-todos", "list-todo", url.equals(application)));
-        elements.add(new NavigationItemDto("basic-absence-overview-link", absenceOverview, "nav.basic.absence-overview", "calendar-range", url.equals(absenceOverview)));
-        // LI fork: presence planning (office / home office)
-        elements.add(new NavigationItemDto("basic-presence-link", "/web/presence", "nav.basic.presence", "building-2", url.startsWith("/web/presence")));
+        // LI fork: the team calendar (presences and absences) replaces the absence overview
+        elements.add(new NavigationItemDto("basic-presence-link", "/web/presence", "nav.basic.presence", "calendar-range", url.startsWith("/web/presence") || url.equals(absenceOverview)));
         // LI fork: csv import / export
         elements.add(new NavigationItemDto("basic-import-export-link", "/web/import-export", "nav.basic.import-export", "download", url.startsWith("/web/import-export")));
 

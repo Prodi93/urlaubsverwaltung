@@ -10,8 +10,9 @@ für den Einsatz in Liechtenstein. Basis ist das jeweils letzte stabile Upstream
 | Feiertage Liechtenstein | Regionen „Liechtenstein“ (gesetzlich) und „Liechtenstein (inkl. Bankfeiertage)“ mit Berchtoldstag, Fasnachtsdienstag und Karfreitag. Heiligabend/Silvester weiterhin über *Einstellungen → Feiertage*. | – |
 | Mail über OAuth2 | SMTP mit XOAUTH2 (Microsoft 365 / Exchange Online) statt Benutzername/Passwort | [docs/mail-oauth2.md](docs/mail-oauth2.md) |
 | PWA | Installierbar auf Smartphone/Desktop, Offline-Seite, Shortcuts | – |
+| Antragsformular | Zeigt den verbleibenden Erholungsurlaub und die verbleibenden Teilzeit-Freitage | – |
 | Teilzeit ohne festen freien Tag | Pensum pro Person (historisiert), automatisch berechnetes Kontingent an „Teilzeit-Freitagen“, eigene Abwesenheitsart | – |
-| Anwesenheit Büro/Homeoffice | Tagesplanung (Büro, Homeoffice, mobil) mit Wochenmuster, Teamübersicht mit Anzahl „im Büro“, Schnell-Eintrag *Heute* für das Smartphone, REST-API `/api/persons/{id}/presences`. Zählt nicht als Abwesenheit. | – |
+| Teamkalender (Anwesenheit + Abwesenheit) | Ersetzt die Abwesenheitsübersicht (`/web/absences` leitet um). Zeigt pro Tag und Halbtag: Büro (blau), Homeoffice (grün), Mobil (lila), Abwesenheiten in der Farbe der Abwesenheitsart (beantragt = umrandet; Details nur für Berechtigte, sonst „abwesend“), Feiertage. Zeile „Im Büro“ zählt halbe Tage mit. Planung im Monat (inkl. Abwesenheiten beantragen und Halbtage), Wochenmuster, Box „Diese Woche“ und Menü im Kalender der Übersichtsseite, Schnell-Eintrag *Heute*, REST-API `/api/persons/{id}/presences`. Abschaltbar mit `uv.fork.presence.replace-absence-overview=false` (nur die Umleitung). | – |
 | CSV-Import/-Export | Export für sich, Abteilung oder Unternehmen: Abwesenheiten, Urlaubskonten, Anwesenheiten, Personen & Arbeitszeiten (inkl. Teilzeit). Import (Office) mit Vorschau, alles oder nichts. | [docs/csv.md](docs/csv.md) |
 
 ## Branches, Versionen und Releases

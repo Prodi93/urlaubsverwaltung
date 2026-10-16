@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Default presence per weekday, valid from {@code validFrom} until the next pattern of the person.
  */
-public record PresencePattern(Long id, Person person, LocalDate validFrom, Map<DayOfWeek, PresenceType> days) {
+public record PresencePattern(Long id, Person person, LocalDate validFrom, Map<DayOfWeek, PresenceSlots> days) {
 
     static PresencePattern of(PresencePatternEntity entity) {
         return new PresencePattern(entity.getId(), entity.getPerson(), entity.getValidFrom(), entity.getDays());

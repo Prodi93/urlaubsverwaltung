@@ -133,14 +133,21 @@
                 </select>
               </div>
 
-              <!-- LI fork: part time free days -->
-              <div th:if="${forkPartTimeFreeDays != null}" class="uv-form__input-row">
+              <!-- LI fork: vacation days and part time free days left -->
+              <div th:if="${forkVacationDaysLeft != null || forkPartTimeFreeDays != null}" class="uv-form__input-row">
                 <span></span>
-                <p
-                  class="text-sm text-black/75 dark:text-zinc-300"
-                  th:text="#{fork.parttime.application.left(${forkPartTimeFreeDays.year}, ${forkPartTimeFreeDays.left})}"
-                  data-test-id="parttime-left-hint"
-                ></p>
+                <div class="text-sm text-black/75 dark:text-zinc-300">
+                  <p
+                    th:if="${forkVacationDaysLeft != null}"
+                    th:text="#{fork.application.vacationDaysLeft(${forkVacationDaysLeft.year}, ${forkVacationDaysLeft.days})}"
+                    data-test-id="vacation-days-left-hint"
+                  ></p>
+                  <p
+                    th:if="${forkPartTimeFreeDays != null}"
+                    th:text="#{fork.parttime.application.left(${forkPartTimeFreeDays.year}, ${forkPartTimeFreeDays.left})}"
+                    data-test-id="parttime-left-hint"
+                  ></p>
+                </div>
               </div>
 
               <div class="uv-form__input-row">

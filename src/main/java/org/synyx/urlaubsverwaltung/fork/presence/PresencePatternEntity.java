@@ -1,8 +1,8 @@
 package org.synyx.urlaubsverwaltung.fork.presence;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
@@ -16,7 +16,6 @@ import java.time.LocalDate;
 import java.util.EnumMap;
 import java.util.Map;
 
-import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.SEQUENCE;
 
 /**
@@ -38,20 +37,20 @@ public class PresencePatternEntity extends AbstractTenantAwareEntity {
     @Column(name = "valid_from", nullable = false)
     private LocalDate validFrom;
 
-    @Enumerated(STRING)
-    private PresenceType monday;
-    @Enumerated(STRING)
-    private PresenceType tuesday;
-    @Enumerated(STRING)
-    private PresenceType wednesday;
-    @Enumerated(STRING)
-    private PresenceType thursday;
-    @Enumerated(STRING)
-    private PresenceType friday;
-    @Enumerated(STRING)
-    private PresenceType saturday;
-    @Enumerated(STRING)
-    private PresenceType sunday;
+    @Convert(converter = PresenceSlotsConverter.class)
+    private PresenceSlots monday;
+    @Convert(converter = PresenceSlotsConverter.class)
+    private PresenceSlots tuesday;
+    @Convert(converter = PresenceSlotsConverter.class)
+    private PresenceSlots wednesday;
+    @Convert(converter = PresenceSlotsConverter.class)
+    private PresenceSlots thursday;
+    @Convert(converter = PresenceSlotsConverter.class)
+    private PresenceSlots friday;
+    @Convert(converter = PresenceSlotsConverter.class)
+    private PresenceSlots saturday;
+    @Convert(converter = PresenceSlotsConverter.class)
+    private PresenceSlots sunday;
 
     protected PresencePatternEntity() {
         // OK
@@ -74,8 +73,8 @@ public class PresencePatternEntity extends AbstractTenantAwareEntity {
         return validFrom;
     }
 
-    Map<DayOfWeek, PresenceType> getDays() {
-        final Map<DayOfWeek, PresenceType> days = new EnumMap<>(DayOfWeek.class);
+    Map<DayOfWeek, PresenceSlots> getDays() {
+        final Map<DayOfWeek, PresenceSlots> days = new EnumMap<>(DayOfWeek.class);
         putIfPresent(days, DayOfWeek.MONDAY, monday);
         putIfPresent(days, DayOfWeek.TUESDAY, tuesday);
         putIfPresent(days, DayOfWeek.WEDNESDAY, wednesday);
@@ -86,7 +85,7 @@ public class PresencePatternEntity extends AbstractTenantAwareEntity {
         return days;
     }
 
-    void setDays(Map<DayOfWeek, PresenceType> days) {
+    void setDays(Map<DayOfWeek, PresenceSlots> days) {
         monday = days.get(DayOfWeek.MONDAY);
         tuesday = days.get(DayOfWeek.TUESDAY);
         wednesday = days.get(DayOfWeek.WEDNESDAY);
@@ -96,7 +95,7 @@ public class PresencePatternEntity extends AbstractTenantAwareEntity {
         sunday = days.get(DayOfWeek.SUNDAY);
     }
 
-    private static void putIfPresent(Map<DayOfWeek, PresenceType> days, DayOfWeek dayOfWeek, PresenceType type) {
+    private static void putIfPresent(Map<DayOfWeek, PresenceSlots> days, DayOfWeek dayOfWeek, PresenceSlots type) {
         if (type != null) {
             days.put(dayOfWeek, type);
         }

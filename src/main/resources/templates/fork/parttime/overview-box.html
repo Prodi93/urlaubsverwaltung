@@ -16,7 +16,9 @@
           </div>
         </th:block>
         <th:block th:ref="parttime-box-body">
-          <span class="text-sm text-black/75 dark:text-zinc-300" th:text="#{fork.parttime.box.left.1}">Es verbleiben</span>
+          <span class="text-sm text-black/75 dark:text-zinc-300" th:text="#{fork.parttime.box.left.1}"
+            >Es verbleiben</span
+          >
           <a
             class="my-1 text-lg font-medium"
             th:href="@{/web/person/{personId}/parttime (personId=${personId}, year=${summary.year})}"
@@ -25,7 +27,10 @@
           >
             7,5 Teilzeit-Freitage
           </a>
-          <span class="text-sm text-black/75 dark:text-zinc-300" th:text="#{fork.parttime.box.quota(${summary.quota}, ${summary.used}, ${summary.waiting})}">
+          <span
+            class="text-sm text-black/75 dark:text-zinc-300"
+            th:text="#{fork.parttime.box.quota(${summary.quota}, ${summary.used}, ${summary.waiting})}"
+          >
             von 10,5 (2 genommen, 1 beantragt)
           </span>
         </th:block>
