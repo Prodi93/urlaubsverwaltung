@@ -1,0 +1,12 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<!--
+  Database changes of the LI fork. Included as last entry of changelogmaster.xml.
+  Tables are prefixed with "fork_" to avoid conflicts with future upstream tables.
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+  <include relativeToChangelogFile="true" file="fork-0001-migrate-malta-to-liechtenstein.xml"/>
+
+</databaseChangeLog>

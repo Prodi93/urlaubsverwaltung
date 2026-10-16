@@ -48,6 +48,7 @@ spring:
     hibernate:
       ddl-auto: validate
   messages:
+    basename: messages,launchpad-core,messages-fork
     fallback-to-system-locale: false
   threads:
     virtual:

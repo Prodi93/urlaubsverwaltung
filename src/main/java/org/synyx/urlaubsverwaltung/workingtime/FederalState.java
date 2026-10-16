@@ -133,6 +133,9 @@ public enum FederalState {
 
     BULGARIA("bg", "bg"),
 
+    LIECHTENSTEIN("li", "li"),
+    LIECHTENSTEIN_BANK_HOLIDAYS("li", "li"),
+
     USA_MARYLAND("us", "md"),
     USA_VIRGINIA("us", "va"),
     USA_WASHINGTON_DC("us", "dc");

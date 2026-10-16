@@ -36,7 +36,7 @@ spring:
     hibernate:
       ddl-auto: validate
   messages:
-    basename: messages,launchpad-core
+    basename: messages,launchpad-core,messages-fork
     fallback-to-system-locale: false
   liquibase:
     change-log: classpath:/dbchangelogs/changelogmaster.xml

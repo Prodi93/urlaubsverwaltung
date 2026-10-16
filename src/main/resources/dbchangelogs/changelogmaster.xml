@@ -33,4 +33,7 @@
   <include relativeToChangelogFile="true" file="changelog-6.15.0-remaining-vacation-days-management-notifications.xml"/>
   <include relativeToChangelogFile="true" file="changelog-6.17.0-add-index-for-username-ignore-case.xml"/>
 
+  <!-- LI fork: keep this include as the last entry -->
+  <include relativeToChangelogFile="true" file="fork/changelog-fork-master.xml"/>
+
 </databaseChangeLog>

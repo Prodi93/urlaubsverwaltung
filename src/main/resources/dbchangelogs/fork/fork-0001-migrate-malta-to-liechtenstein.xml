@@ -1,0 +1,17 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+  <!--
+    Before the fork, the installation used the region "Malta" with a patched jollyday calendar
+    (custom/uv-holidays-li.sh) containing the public and bank holidays of Liechtenstein.
+    These holidays are exactly the ones of the new region LIECHTENSTEIN_BANK_HOLIDAYS, so the region is
+    migrated and the calculated vacation days stay the same.
+  -->
+  <changeSet author="prodi" id="fork-0001-migrate-malta-to-liechtenstein">
+    <sql>UPDATE settings SET federal_state = 'LIECHTENSTEIN_BANK_HOLIDAYS' WHERE federal_state = 'MALTA'</sql>
+    <sql>UPDATE working_time SET federal_state_override = 'LIECHTENSTEIN_BANK_HOLIDAYS' WHERE federal_state_override = 'MALTA'</sql>
+  </changeSet>
+
+</databaseChangeLog>

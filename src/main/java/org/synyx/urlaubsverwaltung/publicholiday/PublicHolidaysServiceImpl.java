@@ -7,6 +7,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.synyx.urlaubsverwaltung.CachedSupplier;
 import org.synyx.urlaubsverwaltung.absence.DateRange;
+import org.synyx.urlaubsverwaltung.fork.publicholiday.AdditionalPublicHolidaysProvider;
 import org.synyx.urlaubsverwaltung.period.DayLength;
 import org.synyx.urlaubsverwaltung.settings.SettingsService;
 import org.synyx.urlaubsverwaltung.workingtime.FederalState;
@@ -32,11 +33,18 @@ public class PublicHolidaysServiceImpl implements PublicHolidaysService {
 
     private final Map<String, HolidayManager> holidayManagers;
     private final SettingsService settingsService;
+    private final List<AdditionalPublicHolidaysProvider> additionalPublicHolidaysProviders;
+
+    public PublicHolidaysServiceImpl(SettingsService settingsService, Map<String, HolidayManager> holidayManagers) {
+        this(settingsService, holidayManagers, List.of());
+    }
 
     @Autowired
-    public PublicHolidaysServiceImpl(SettingsService settingsService, Map<String, HolidayManager> holidayManagers) {
+    public PublicHolidaysServiceImpl(SettingsService settingsService, Map<String, HolidayManager> holidayManagers,
+                                     List<AdditionalPublicHolidaysProvider> additionalPublicHolidaysProviders) {
         this.settingsService = settingsService;
         this.holidayManagers = holidayManagers;
+        this.additionalPublicHolidaysProviders = additionalPublicHolidaysProviders;
     }
 
     @Override
@@ -61,7 +69,7 @@ public class PublicHolidaysServiceImpl implements PublicHolidaysService {
         final Locale locale = LocaleContextHolder.getLocale();
 
         return getHolidays(from, to, federalState).stream()
-            .map(holiday -> new PublicHoliday(holiday.getDate(), getHolidayDayLength(publicHolidaysSettingsSupplier, holiday.getDate(), federalState), holiday.getDescription(locale)))
+            .map(holiday -> new PublicHoliday(holiday.getDate(), getHolidayDayLength(publicHolidaysSettingsSupplier, holiday.getDate(), federalState), getDescription(holiday, locale)))
             .toList();
     }
 
@@ -86,6 +94,8 @@ public class PublicHolidaysServiceImpl implements PublicHolidaysService {
             .map(holidayManager -> holidayManager.getHolidays(from, to, PUBLIC_HOLIDAY, federalState.getCodes()))
             .orElseGet(HashSet::new);
 
+        addAdditionalHolidays(holidays, from, to, federalState);
+
         final DateRange requestRange = new DateRange(from, to);
 
         int year = from.getYear();
@@ -109,9 +119,30 @@ public class PublicHolidaysServiceImpl implements PublicHolidaysService {
             return true;
         }
 
-        return getHolidayManager(federalState)
+        final boolean isAdditionalHoliday = additionalPublicHolidaysProviders.stream()
+            .anyMatch(provider -> provider.isHoliday(date, federalState));
+
+        return isAdditionalHoliday || getHolidayManager(federalState)
             .map(holidayManager -> holidayManager.isHoliday(date, federalState.getCodes()))
             .orElse(false);
+    }
+
+    private void addAdditionalHolidays(Set<Holiday> holidays, LocalDate from, LocalDate to, FederalState federalState) {
+        final Set<LocalDate> dates = new HashSet<>();
+        holidays.forEach(holiday -> dates.add(holiday.getDate()));
+
+        additionalPublicHolidaysProviders.stream()
+            .flatMap(provider -> provider.getHolidays(from, to, federalState).stream())
+            .filter(holiday -> dates.add(holiday.getDate()))
+            .forEach(holidays::add);
+    }
+
+    private String getDescription(Holiday holiday, Locale locale) {
+        return additionalPublicHolidaysProviders.stream()
+            .map(provider -> provider.getDescription(holiday, locale))
+            .flatMap(Optional::stream)
+            .findFirst()
+            .orElseGet(() -> holiday.getDescription(locale));
     }
 
     private Optional<HolidayManager> getHolidayManager(FederalState federalState) {
