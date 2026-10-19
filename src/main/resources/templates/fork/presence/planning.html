@@ -179,7 +179,7 @@
           <div
             th:each="weekDay : ${weekDays}"
             class="flex flex-wrap items-center gap-x-4 gap-y-2"
-            th:with="slots=${pattern[weekDay]}"
+            th:with="slots=${pattern.get(weekDay)}"
           >
             <span class="w-28 text-sm" th:text="#{${weekDay.name}}">Montag</span>
             <th:block th:each="halfName : ${ {'morning', 'noon'} }">
